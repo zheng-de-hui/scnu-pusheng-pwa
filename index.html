@@ -1,0 +1,2049 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#1f3a5f">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="普通生物学备考工作台">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<title>华南师大 906/863 普通生物学 · 备考工作台</title>
+<style>
+/* ============ Typography token（V6.0 §19，B 独立实现） ============ */
+:root{
+  --fs-xs:12px; --fs-sm:13px; --fs-base:14.5px; --fs-md:16px; --fs-lg:18px; --fs-xl:22px; --fs-2xl:28px; --fs-3xl:32px;
+  --lh-tight:1.45; --lh-normal:1.6; --lh-read:1.75;
+  --fw-light:300; --fw-normal:400; --fw-medium:500; --fw-bold:700; --fw-heavy:800;
+  --serif:"Noto Serif SC","Source Han Serif SC","Songti SC",STSong,Georgia,serif;
+  --sans:"Noto Sans SC","PingFang SC","Microsoft YaHei",sans-serif;
+  --paper:#f6f2e9; --paper-2:#ece5d4; --ink:#2a2620; --ink-soft:#5c5547; --ink-faint:#8c8474;
+  --accent:#a63a2b; --blue:#1f3a5f; --blue-soft:#dce5ef; --gold:#b8913c;
+  --line:#d6ccb4; --line-strong:#b4a885; --ok:#3d6b35; --ok-bg:#e4ead8;
+  --ease-out:cubic-bezier(.22,1,.36,1);
+  --tr-ui:color .18s var(--ease-out),border-color .18s var(--ease-out),background .18s var(--ease-out);
+  --tr-card:transform .2s var(--ease-out),box-shadow .2s var(--ease-out),border-color .2s var(--ease-out);
+  --shadow:0 2px 10px rgba(42,38,32,.08);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--sans);font-size:var(--fs-base);line-height:var(--lh-normal);background:var(--paper);color:var(--ink);min-height:100vh;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");}
+button{font-family:var(--sans);cursor:pointer}
+h1,h2,h3,.serif{font-family:var(--serif)}
+#mainArea{view-transition-name:main-content}
+::view-transition-group(main-content){animation:none}
+::view-transition-old(main-content){animation:180ms var(--ease-out) both pageOut;mix-blend-mode:plus-lighter}
+::view-transition-new(main-content){animation:180ms var(--ease-out) both pageIn;mix-blend-mode:plus-lighter;object-fit:none;object-position:top left}
+@keyframes pageOut{from{opacity:1}to{opacity:0}}
+@keyframes pageIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+/* 顶栏 */
+.topbar{position:sticky;top:0;z-index:50;background:rgba(246,242,233,.94);backdrop-filter:blur(8px);
+  border-bottom:2px solid var(--line-strong);padding:10px 14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px;margin-right:auto}
+.seal{width:38px;height:38px;border-radius:50%;background:var(--accent);color:var(--paper);display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-weight:700;font-size:14px}
+.brand h1{font-size:var(--fs-md);font-weight:var(--fw-heavy)}
+.brand .sub{font-size:var(--fs-xs);color:var(--ink-faint)}
+.nav{margin-left:auto;display:flex;gap:5px;flex-wrap:wrap}
+.nav button{border:1.5px solid var(--line-strong);background:var(--paper);border-radius:8px;padding:6px 10px;font-size:var(--fs-xs);transition:var(--tr-ui)}
+.nav button.active{background:var(--blue);color:#fff;border-color:var(--blue)}
+.nav button:hover:not(.active){border-color:var(--accent)}
+.progress{display:flex;align-items:center;gap:6px;min-width:120px}
+.pbar{flex:1;height:8px;background:var(--paper-2);border:1px solid var(--line);border-radius:99px;overflow:hidden}
+.pfill{height:100%;background:linear-gradient(90deg,var(--gold),var(--accent));border-radius:99px;transition:width .4s ease}
+
+.main{max-width:1000px;margin:0 auto;padding:22px 20px 80px}
+.view{animation:viewEnter 180ms var(--ease-out)}
+.view.soft{animation:viewSoft 140ms var(--ease-out)}
+.view.still{animation:none}
+@keyframes viewEnter{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@keyframes viewSoft{from{opacity:0;transform:translateY(3px)}to{opacity:1;transform:none}}
+
+.ch-head{border-bottom:3px double var(--line-strong);padding-bottom:12px;margin-bottom:16px}
+.ch-head h2{font-size:var(--fs-2xl);font-weight:var(--fw-heavy)}
+.ch-head .ov{font-size:var(--fs-sm);color:var(--ink-soft);margin-top:6px;line-height:var(--lh-read)}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:12px}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:16px;transition:var(--tr-card)}
+.card:hover{border-color:var(--accent);box-shadow:var(--shadow)}
+.card h3{font-size:var(--fs-md);margin-bottom:6px}
+.card .n{font-size:var(--fs-3xl);font-family:var(--serif);font-weight:800;color:var(--accent)}
+.card .d{font-size:var(--fs-xs);color:var(--ink-faint)}
+.card.click{cursor:pointer}
+
+.ch-list{display:flex;flex-direction:column;gap:8px}
+.ch-row{display:flex;align-items:center;gap:10px;background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:10px 14px;cursor:pointer;transition:var(--tr-card)}
+.ch-row:hover{border-color:var(--accent);transform:translateX(2px)}
+.ch-row .no{font-family:var(--serif);font-weight:800;color:var(--accent);background:rgba(166,58,43,.08);border-radius:6px;padding:2px 8px;font-size:var(--fs-sm);flex-shrink:0}
+.ch-row .tt{flex:1;font-size:var(--fs-sm);font-weight:600}
+.ch-row .hot{font-size:var(--fs-xs);color:var(--gold)}
+.ch-row .cnt{font-size:var(--fs-xs);color:var(--ink-faint)}
+.ch-row .mbar{width:70px;height:6px;background:var(--paper-2);border-radius:99px;overflow:hidden}
+.ch-row .mfill{height:100%;border-radius:99px}
+
+.concept-chip{display:inline-flex;align-items:center;gap:8px;background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:5px 10px;font-size:var(--fs-xs);cursor:pointer;margin:0 6px 6px 0;transition:var(--tr-ui)}
+.concept-chip:hover{border-color:var(--blue);background:var(--blue-soft)}
+.concept-chip .mono{font-size:var(--fs-xs);color:var(--ink-faint)}
+
+.q-card{background:var(--paper);border:1.5px solid var(--line-strong);border-radius:14px;padding:22px 24px;margin-bottom:14px}
+.q-type{display:inline-block;font-size:var(--fs-xs);font-weight:700;color:#fff;border-radius:6px;padding:3px 10px;margin-bottom:8px}
+.t-choice{background:var(--blue)}.t-judge{background:#6d4c8f}.t-fill{background:var(--gold)}.t-name{background:var(--accent)}.t-short{background:#3d6b35}
+.q-stem{font-size:var(--fs-md);line-height:var(--lh-read);font-family:var(--serif);margin-bottom:16px}
+.q-meta{font-size:var(--fs-xs);color:var(--ink-faint);margin-bottom:10px}
+.opts{display:flex;flex-direction:column;gap:8px}
+.opt{display:flex;align-items:center;gap:10px;border:1.5px solid var(--line);border-radius:9px;padding:10px 14px;cursor:pointer;background:var(--paper-2);font-size:var(--fs-sm);transition:var(--tr-ui)}
+.opt:hover{border-color:var(--blue)}
+.opt .letter{width:24px;height:24px;border-radius:50%;border:2px solid var(--line-strong);display:flex;align-items:center;justify-content:center;font-size:var(--fs-xs);font-weight:700;flex-shrink:0}
+.opt.correct{border-color:var(--ok);background:var(--ok-bg)}
+.opt.correct .letter{background:var(--ok);color:#fff;border-color:var(--ok)}
+.opt.wrong{border-color:var(--accent);background:#f6e3df}
+.opt.wrong .letter{background:var(--accent);color:#fff;border-color:var(--accent)}
+.ans-input{width:100%;border:1.5px solid var(--line-strong);border-radius:9px;background:var(--paper);font-family:var(--sans);font-size:var(--fs-sm);padding:10px 12px;outline:none;margin-bottom:10px;transition:var(--tr-ui)}
+.ans-input:focus{border-color:var(--blue)}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+.btn{border:none;border-radius:9px;padding:9px 18px;font-size:var(--fs-sm);font-weight:600;transition:var(--tr-ui)}
+.btn.primary{background:var(--blue);color:#fff}
+.btn.primary:hover{background:var(--accent)}
+.btn.ghost{background:var(--paper-2);color:var(--ink-soft);border:1.5px solid var(--line-strong)}
+.feedback{margin-top:14px;border-radius:10px;padding:12px 14px;font-size:var(--fs-sm);line-height:var(--lh-read);display:none}
+.feedback.show{display:block}
+.feedback.ok{background:var(--ok-bg);border:1px solid var(--ok);color:var(--ok)}
+.feedback.no{background:#f6e3df;border:1px solid var(--accent);color:var(--accent)}
+.q-nav{display:flex;justify-content:space-between;align-items:center;margin-top:8px}
+.prog-dots{display:flex;gap:4px;flex-wrap:wrap}
+.pdot{width:9px;height:9px;border-radius:50%;background:var(--line)}
+.pdot.done{background:var(--ok)}
+.pdot.now{outline:2px solid var(--accent)}
+
+/* 六档掌握度颜色 */
+.lv0{color:#e6dfd0}.lv1{color:#c96f5e}.lv2{color:#d4b95e}.lv3{color:#a3b98a}.lv4{color:#7fa06b}.lv5{color:#4c7a37}
+.lv-bg0{background:#e6dfd0}.lv-bg1{background:#f6e3df}.lv-bg2{background:#f3ecd4}.lv-bg3{background:#e4ead8}.lv-bg4{background:#d5e2cc}.lv-bg5{background:#c3d8b4}
+.lv-pill{display:inline-block;font-size:var(--fs-xs);border-radius:999px;padding:2px 10px;font-weight:600}
+.lv-bar{height:8px;border-radius:99px;background:var(--paper-2);overflow:hidden;margin:3px 0}
+.lv-fill{height:100%;border-radius:99px}
+
+/* 错因 */
+.err-pick{margin-top:10px;padding:10px 12px;background:var(--paper-2);border:1px dashed var(--line-strong);border-radius:9px}
+.err-tip{font-size:var(--fs-xs);color:var(--ink-soft);display:block;margin-bottom:6px}
+.err-btns{display:flex;flex-wrap:wrap;gap:6px}
+.err-btn{border:1px solid var(--line-strong);background:var(--paper);border-radius:999px;padding:4px 10px;font-size:var(--fs-xs);transition:var(--tr-ui)}
+.err-btn:hover{border-color:var(--accent);color:var(--accent)}
+.err-btn.sel{background:var(--accent);color:#fff;border-color:var(--accent)}
+.err-pick.done{font-size:var(--fs-xs);color:var(--ok)}
+
+/* 讲解卡 */
+.concept-ref{border:1.5px solid var(--gold);background:linear-gradient(135deg,#fbf6ea,#f6eeda);border-radius:10px;padding:12px 14px;margin-top:10px}
+.concept-ref .cr-title{font-family:var(--serif);font-weight:700;color:var(--accent);font-size:var(--fs-sm);margin-bottom:6px}
+.concept-ref .cr-row{font-size:var(--fs-xs);line-height:var(--lh-read);margin-top:4px}
+.concept-ref .cr-row b{color:var(--blue)}
+.concept-ref .cr-pit{color:var(--accent)}
+.concept-ref .cr-mn{color:var(--ink-soft);font-style:italic}
+
+/* 快闪卡 */
+.flash-wrap{max-width:620px;margin:0 auto}
+.flash-card{perspective:1200px;height:300px;margin-bottom:16px;cursor:pointer}
+.flash-inner{position:relative;width:100%;height:100%;transition:transform .5s var(--ease-out);transform-style:preserve-3d}
+.flash-card.flipped .flash-inner{transform:rotateY(180deg)}
+.flash-face{position:absolute;width:100%;height:100%;backface-visibility:hidden;border-radius:16px;padding:30px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+.flash-front{background:var(--paper);border:2px solid var(--line-strong)}
+.flash-back{background:linear-gradient(135deg,var(--blue),#2a4d7d);color:#fff;transform:rotateY(180deg)}
+.flash-front .term{font-family:var(--serif);font-size:var(--fs-2xl);font-weight:800}
+.flash-back .def{font-size:var(--fs-md);line-height:var(--lh-read)}
+.grade-row{display:flex;gap:10px;justify-content:center}
+.grade-btn{border:1.5px solid var(--line-strong);background:var(--paper);border-radius:10px;padding:10px 20px;font-size:var(--fs-sm);transition:var(--tr-ui)}
+.grade-btn:hover{transform:translateY(-2px)}
+.grade-btn.g0:hover{border-color:#c96f5e;background:#f6e3df}
+.grade-btn.g1:hover{border-color:var(--gold);background:#f3ecd4}
+.grade-btn.g2:hover{border-color:var(--ok);background:var(--ok-bg)}
+
+/* 认知地图 */
+.map-ch{border:1px solid var(--line);border-radius:10px;background:var(--paper);margin-bottom:8px;overflow:hidden}
+.map-ch-head{display:flex;align-items:center;gap:10px;padding:10px 14px;cursor:pointer;transition:var(--tr-ui)}
+.map-ch-head:hover{background:var(--paper-2)}
+.map-ch-head .heat{flex:1;height:8px;border-radius:99px;background:var(--paper-2);overflow:hidden}
+.map-ch-head .heatf{height:100%;background:linear-gradient(90deg,#c96f5e,#d4b95e,#7fa06b)}
+.map-grid{display:none;padding:10px 14px;gap:6px;flex-wrap:wrap;border-top:1px dashed var(--line)}
+.map-grid.open{display:flex}
+.map-cell{border:1px solid var(--line);border-radius:7px;padding:6px 10px;font-size:var(--fs-xs);cursor:pointer;transition:var(--tr-ui);min-width:120px}
+.map-cell:hover{border-color:var(--accent)}
+
+/* 模考结果 */
+.mock-score{text-align:center;font-family:var(--serif);font-size:52px;font-weight:800;color:var(--accent)}
+.mock-type-row{display:flex;gap:8px;align-items:center;margin-top:6px}
+.mock-type-row .tl{width:90px;font-size:var(--fs-xs)}
+.mock-type-row .bar{flex:1;height:14px;border-radius:4px;background:var(--paper-2);overflow:hidden}
+.mock-type-row .bf{height:100%;background:var(--ok);border-radius:4px}
+
+/* 任务行 */
+.task-row{display:flex;align-items:center;gap:12px;background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:10px 14px;margin-bottom:8px;transition:var(--tr-card)}
+.task-row:hover{border-color:var(--accent)}
+.task-row .t-icon{font-size:20px;width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.task-row .t-info{flex:1}
+.task-row .t-name2{font-size:var(--fs-sm);font-weight:600}
+.task-row .t-desc{font-size:var(--fs-xs);color:var(--ink-soft);margin-top:2px}
+.task-row .go-btn{border:none;background:var(--blue);color:#fff;border-radius:8px;padding:7px 14px;font-size:var(--fs-xs);font-weight:600;transition:var(--tr-ui)}
+.task-row .go-btn:hover{background:var(--accent)}
+.task-row .go-btn.ghost{background:var(--paper-2);color:var(--ink-soft);border:1.5px solid var(--line-strong)}
+
+.w-item{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin-bottom:8px;display:flex;gap:10px;align-items:flex-start}
+.w-item .info{flex:1;font-size:var(--fs-sm);line-height:var(--lh-normal)}
+.w-item .act{display:flex;gap:6px;flex-direction:column}
+
+table{width:100%;border-collapse:collapse;font-size:var(--fs-xs);margin-top:8px}
+th{background:var(--ink);color:var(--paper);padding:6px 10px;text-align:left}
+td{border:1px solid var(--line-strong);padding:6px 10px}
+tr:nth-child(even) td{background:rgba(255,255,255,.4)}
+
+.empty{text-align:center;padding:50px 20px;color:var(--ink-faint);font-family:var(--serif);font-size:var(--fs-md)}
+.mono{font-family:monospace;font-size:var(--fs-xs);color:var(--ink-faint)}
+.float-btn{position:fixed;bottom:24px;right:24px;width:44px;height:44px;border-radius:50%;background:var(--blue);color:#fff;border:none;font-size:18px;cursor:pointer;box-shadow:0 4px 14px rgba(31,58,95,.35);opacity:0;pointer-events:none;transition:var(--tr-ui);z-index:40}
+.float-btn.show{opacity:1;pointer-events:auto}
+@media(max-width:700px){.grid{grid-template-columns:1fr}.main{padding:16px 12px 60px}.topbar{padding:8px 10px}.brand h1{font-size:var(--fs-sm)}}
+
+/* ============ PWA / 手机增强层（不改变原有 UI 视觉体系） ============ */
+html{background:var(--paper);overscroll-behavior-y:none}
+body{padding-bottom:env(safe-area-inset-bottom);-webkit-tap-highlight-color:transparent}
+button,.opt,.ch-row,.concept-chip,.map-ch-head,.map-cell,.flash-card,.grade-btn{touch-action:manipulation}
+/* ============ Mobile UI 2.0 ============ */
+/* 手机端：隐藏 PC 顶栏，显示手机端专用顶部栏和底部导航 */
+.m-topbar{display:none}
+.m-bottom-nav{display:none}
+.m-qdrawer{display:none}
+.m-profile-page{display:none}
+
+@media(max-width:700px){
+  /* 隐藏 PC 端顶部导航 */
+  .topbar{display:none !important}
+  
+  /* 手机端顶部栏 */
+  .m-topbar{
+    display:flex; align-items:center; gap:10px;
+    position:sticky; top:0; z-index:50;
+    background:rgba(246,242,233,.96); backdrop-filter:blur(10px);
+    border-bottom:1.5px solid var(--line-strong);
+    padding:10px 14px;
+    padding-top:max(10px,env(safe-area-inset-top));
+    min-height:48px;
+  }
+  .m-topbar .m-back{
+    width:36px; height:36px; border:none; background:transparent;
+    font-size:20px; color:var(--ink); border-radius:8px;
+    display:flex; align-items:center; justify-content:center;
+    flex-shrink:0;
+  }
+  .m-topbar .m-back:active{background:var(--paper-2)}
+  .m-topbar .m-title{
+    flex:1; font-family:var(--serif); font-weight:700; font-size:var(--fs-md);
+    text-align:center; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  }
+  .m-topbar .m-right{
+    width:36px; height:36px; display:flex; align-items:center; justify-content:center;
+    font-size:18px; flex-shrink:0;
+  }
+  .m-topbar .m-right button{
+    width:36px; height:36px; border:none; background:transparent;
+    font-size:18px; border-radius:8px; color:var(--ink);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .m-topbar .m-right button:active{background:var(--paper-2)}
+
+  /* 底部5导航 */
+  .m-bottom-nav{
+    display:flex; position:fixed; bottom:0; left:0; right:0; z-index:50;
+    background:rgba(246,242,233,.98); backdrop-filter:blur(10px);
+    border-top:1.5px solid var(--line-strong);
+    padding-bottom:env(safe-area-inset-bottom);
+    padding-top:6px;
+  }
+  .m-nav-item{
+    flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    gap:2px; padding:6px 4px 8px; background:transparent; border:none;
+    font-size:10px; color:var(--ink-faint); font-family:var(--sans);
+    transition:color .18s var(--ease-out);
+    touch-action:manipulation;
+  }
+  .m-nav-item .icon{font-size:22px; line-height:1}
+  .m-nav-item.active{color:var(--blue); font-weight:600}
+  .m-nav-item:active{opacity:.6}
+
+  /* 主内容区适配 */
+  .main{
+    padding:14px 14px !important;
+    padding-bottom:calc(70px + env(safe-area-inset-bottom)) !important;
+    max-width:100% !important;
+  }
+  body.has-bottom-nav .main{
+    padding-bottom:calc(70px + env(safe-area-inset-bottom)) !important;
+  }
+  body.immersive .main{
+    padding-bottom:14px !important;
+  }
+  body.immersive .m-bottom-nav{display:none !important}
+
+  /* 浮动按钮位置调整 */
+  .float-btn{
+    right:16px;
+    bottom:calc(76px + env(safe-area-inset-bottom)) !important;
+  }
+  body.immersive .float-btn{
+    bottom:calc(18px + env(safe-area-inset-bottom)) !important;
+  }
+
+  /* ========== 手机端首页 ========== */
+  .m-hero{
+    background:linear-gradient(135deg,var(--blue),#2a4d7d);
+    color:#fff; border-radius:16px; padding:22px 20px;
+    margin-bottom:16px;
+  }
+  .m-hero .m-hero-title{
+    font-family:var(--serif); font-size:var(--fs-lg); font-weight:700;
+    margin-bottom:4px;
+  }
+  .m-hero .m-hero-sub{font-size:var(--fs-xs); opacity:.85}
+  .m-today-study{
+    background:rgba(255,255,255,.15); border-radius:12px; padding:14px;
+    margin-top:14px; text-align:center;
+  }
+  .m-today-num{
+    font-family:var(--serif); font-size:36px; font-weight:800; line-height:1;
+  }
+  .m-today-num small{font-size:16px; font-weight:400; opacity:.8}
+  .m-today-bar{
+    height:8px; background:rgba(255,255,255,.25); border-radius:99px;
+    margin-top:10px; overflow:hidden;
+  }
+  .m-today-fill{
+    height:100%; background:linear-gradient(90deg,var(--gold),#fff);
+    border-radius:99px; transition:width .4s ease;
+  }
+  .m-today-acc{font-size:var(--fs-xs); margin-top:8px; opacity:.9}
+  .m-hero-btn{
+    display:block; width:100%; margin-top:14px;
+    background:var(--accent); color:#fff; border:none; border-radius:10px;
+    padding:12px; font-size:var(--fs-sm); font-weight:700;
+    font-family:var(--sans);
+  }
+  .m-hero-btn:active{opacity:.85}
+
+  /* 数据概览 */
+  .m-stats-row{
+    display:grid; grid-template-columns:repeat(3,1fr); gap:10px;
+    margin-bottom:16px;
+  }
+  .m-stat-card{
+    background:var(--paper); border:1px solid var(--line); border-radius:12px;
+    padding:14px 10px; text-align:center;
+  }
+  .m-stat-card .num{
+    font-family:var(--serif); font-size:24px; font-weight:800; color:var(--accent);
+  }
+  .m-stat-card .lbl{
+    font-size:11px; color:var(--ink-faint); margin-top:2px;
+  }
+
+  /* 章节列表-手机版 */
+  .m-section-title{
+    font-family:var(--serif); font-size:var(--fs-md); font-weight:700;
+    margin:18px 0 10px; display:flex; align-items:center; gap:6px;
+  }
+  .m-section-title .more{
+    margin-left:auto; font-size:var(--fs-xs); color:var(--blue);
+    font-family:var(--sans); font-weight:500;
+  }
+
+  /* 推荐卡片 */
+  .m-recommend-list{display:flex; flex-direction:column; gap:8px}
+  .m-rec-item{
+    display:flex; align-items:center; gap:12px;
+    background:var(--paper); border:1px solid var(--line); border-radius:10px;
+    padding:12px 14px;
+  }
+  .m-rec-item .rec-icon{
+    width:40px; height:40px; border-radius:10px;
+    background:var(--blue-soft); display:flex; align-items:center; justify-content:center;
+    font-size:20px; flex-shrink:0;
+  }
+  .m-rec-item .rec-info{flex:1; min-width:0}
+  .m-rec-item .rec-title{font-size:var(--fs-sm); font-weight:600}
+  .m-rec-item .rec-desc{font-size:var(--fs-xs); color:var(--ink-faint); margin-top:2px}
+  .m-rec-item .rec-go{
+    color:var(--blue); font-size:18px; flex-shrink:0;
+  }
+
+  /* ========== 刷题页-手机版 ========== */
+  .m-practice-head{
+    display:flex; align-items:center; justify-content:space-between;
+    margin-bottom:12px;
+  }
+  .m-practice-progress{
+    font-size:var(--fs-sm); font-weight:600;
+  }
+  .m-q-dots{
+    display:flex; gap:5px; flex-wrap:wrap; justify-content:center;
+    margin:8px 0 4px;
+  }
+  .m-q-dot{
+    width:8px; height:8px; border-radius:50%; background:var(--line);
+  }
+  .m-q-dot.done{background:var(--ok)}
+  .m-q-dot.now{background:var(--accent); transform:scale(1.3)}
+
+  /* 题号抽屉 */
+  .m-qdrawer{
+    position:fixed; top:0; left:0; right:0; bottom:0; z-index:100;
+    background:rgba(42,38,32,.5);
+    display:none; align-items:flex-end; justify-content:center;
+  }
+  .m-qdrawer.show{display:flex}
+  .m-qdrawer-inner{
+    background:var(--paper); width:100%; max-width:500px;
+    border-radius:16px 16px 0 0;
+    padding:16px;
+    padding-bottom:calc(16px + env(safe-area-inset-bottom));
+    max-height:75vh; overflow-y:auto;
+    animation:drawerUp .25s var(--ease-out);
+  }
+  @keyframes drawerUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+  .m-qdrawer-title{
+    font-family:var(--serif); font-size:var(--fs-md); font-weight:700;
+    text-align:center; margin-bottom:12px;
+  }
+  .m-qdrawer-close{
+    display:block; width:100%; margin-top:12px;
+    background:var(--paper-2); border:1.5px solid var(--line-strong);
+    border-radius:10px; padding:10px; font-size:var(--fs-sm);
+    font-family:var(--sans); font-weight:600;
+  }
+
+  /* 题号网格 */
+  .m-qgrid{
+    display:grid; grid-template-columns:repeat(6,1fr); gap:8px;
+  }
+  .m-qgrid button{
+    aspect-ratio:1; border:1.5px solid var(--line); background:var(--paper);
+    border-radius:8px; font-size:var(--fs-sm); font-weight:600;
+    font-family:var(--sans); color:var(--ink);
+  }
+  .m-qgrid button.done{background:var(--ok-bg); border-color:var(--ok); color:var(--ok)}
+  .m-qgrid button.current{background:var(--accent); border-color:var(--accent); color:#fff}
+
+  /* 刷题页底部操作栏 */
+  .m-practice-footer{
+    position:fixed; bottom:0; left:0; right:0; z-index:40;
+    background:rgba(246,242,233,.98); backdrop-filter:blur(10px);
+    border-top:1.5px solid var(--line-strong);
+    padding:10px 14px;
+    padding-bottom:calc(10px + env(safe-area-inset-bottom));
+    display:flex; gap:10px;
+  }
+  .m-practice-footer .m-pf-btn{
+    flex:1; min-height:44px; border-radius:10px;
+    font-size:var(--fs-sm); font-weight:600; font-family:var(--sans);
+    border:none;
+  }
+  .m-practice-footer .m-pf-btn.primary{background:var(--blue); color:#fff}
+  .m-practice-footer .m-pf-btn.ghost{
+    background:var(--paper-2); color:var(--ink-soft);
+    border:1.5px solid var(--line-strong);
+  }
+
+  /* 沉浸式刷题：隐藏底部导航，显示刷题底部栏 */
+  body.immersive-practice .m-bottom-nav{display:none !important}
+  body.immersive-practice .main{
+    padding-bottom:calc(80px + env(safe-area-inset-bottom)) !important;
+  }
+
+  /* ========== 我的页面 ========== */
+  .m-profile-header{
+    background:linear-gradient(135deg,var(--blue),#2a4d7d);
+    color:#fff; border-radius:16px; padding:22px 20px;
+    margin-bottom:16px;
+  }
+  .m-profile-name{
+    font-family:var(--serif); font-size:var(--fs-lg); font-weight:700;
+  }
+  .m-profile-desc{font-size:var(--fs-xs); opacity:.85; margin-top:4px}
+
+  .m-menu-group{
+    background:var(--paper); border:1px solid var(--line);
+    border-radius:12px; overflow:hidden; margin-bottom:12px;
+  }
+  .m-menu-item{
+    display:flex; align-items:center; gap:12px;
+    padding:14px; border-bottom:1px solid var(--line);
+    cursor:pointer;
+  }
+  .m-menu-item:last-child{border-bottom:none}
+  .m-menu-item:active{background:var(--paper-2)}
+  .m-menu-item .m-icon{
+    width:32px; height:32px; border-radius:8px;
+    background:var(--blue-soft); display:flex; align-items:center; justify-content:center;
+    font-size:16px; flex-shrink:0;
+  }
+  .m-menu-item .m-label{flex:1; font-size:var(--fs-sm)}
+  .m-menu-item .m-arrow{color:var(--ink-faint); font-size:14px}
+  .m-menu-item .m-value{font-size:var(--fs-xs); color:var(--ink-faint)}
+
+  /* 掌握度分布条 */
+  .m-lv-dist{
+    background:var(--paper); border:1px solid var(--line); border-radius:12px;
+    padding:14px; margin-bottom:12px;
+  }
+  .m-lv-row{
+    display:flex; align-items:center; gap:8px; margin-top:6px;
+  }
+  .m-lv-row:first-child{margin-top:0}
+  .m-lv-name{width:50px; font-size:var(--fs-xs); flex-shrink:0}
+  .m-lv-bar{flex:1; height:8px; background:var(--paper-2); border-radius:99px; overflow:hidden}
+  .m-lv-fill{height:100%; border-radius:99px}
+  .m-lv-num{width:36px; text-align:right; font-size:var(--fs-xs); color:var(--ink-faint); flex-shrink:0}
+
+  /* 其他调整 */
+  .q-card{padding:16px 14px !important}
+  .q-stem{font-size:16px !important}
+  .opt{padding:11px 12px !important; min-height:44px !important}
+  .btn,.grade-btn{min-height:42px !important}
+  .flash-card{height:280px !important}
+  table{display:block; overflow-x:auto; white-space:nowrap}
+
+  /* 章节列表手机端 */
+  .ch-row{padding:12px 14px !important}
+  .ch-row .no{padding:4px 10px !important}
+
+  /* 首页卡片手机端优化 */
+  .grid{grid-template-columns:1fr 1fr !important}
+  .card{padding:14px !important}
+  .card .n{font-size:28px !important}
+
+  /* 隐藏 PC 端 ch-head，手机端用 m-topbar 代替 */
+  .ch-head{display:none}
+  
+  /* 但在知识详情等页面需要保留一些信息 */
+  .m-sub-info{
+    font-size:var(--fs-xs); color:var(--ink-soft);
+    margin-bottom:12px; text-align:center;
+  }
+}
+
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <div class="seal">906</div>
+    <div>
+      <h1>普通生物学 · 备考工作台</h1>
+      <div class="sub">华南师大 906/863 · 陈阅增第5版 41章 · 独立工作台 B</div>
+    </div>
+  </div>
+  <div class="progress" title="六档掌握度均值">
+    <div class="pbar"><div class="pfill" id="progFill"></div></div>
+    <span class="mono" id="progTxt">0</span>
+  </div>
+  <button class="icon-btn" id="syncBtn" title="把学习数据回写到 vault 05_题库/学习数据.json（Chrome/Edge）" style="color:var(--ok);border-color:var(--ok)">☁ 同步</button>
+  <nav class="nav">
+    <button data-v="home" class="active">🏠 首页</button>
+    <button data-v="chapters">📚 章节</button>
+    <button data-v="concepts">🧠 知识</button>
+    <button data-v="map">🗺 地图</button>
+    <button data-v="flash">🃏 快闪</button>
+    <button data-v="wrong">📕 错题</button>
+    <button data-v="diag">🩺 诊断</button>
+    <button data-v="mock">🎯 模拟</button>
+  </nav>
+</header>
+
+<!-- ============ Mobile UI 2.0 专用结构 ============ -->
+<!-- 手机端顶部栏 -->
+<header class="m-topbar" id="mTopbar">
+  <button class="m-back" id="mBackBtn" style="visibility:hidden">←</button>
+  <div class="m-title" id="mTitle">普通生物学</div>
+  <div class="m-right">
+    <button id="mMenuBtn" title="更多">⋯</button>
+  </div>
+</header>
+
+<main class="main" id="mainArea"></main>
+<button class="float-btn" id="topBtn" title="回到顶部">↑</button>
+
+<!-- 手机端底部5导航 -->
+<nav class="m-bottom-nav" id="mBottomNav">
+  <button class="m-nav-item active" data-mv="home">
+    <span class="icon">🏠</span>
+    <span>首页</span>
+  </button>
+  <button class="m-nav-item" data-mv="chapters">
+    <span class="icon">📚</span>
+    <span>刷题</span>
+  </button>
+  <button class="m-nav-item" data-mv="concepts">
+    <span class="icon">🧠</span>
+    <span>知识</span>
+  </button>
+  <button class="m-nav-item" data-mv="wrong">
+    <span class="icon">📕</span>
+    <span>错题</span>
+  </button>
+  <button class="m-nav-item" data-mv="profile">
+    <span class="icon">👤</span>
+    <span>我的</span>
+  </button>
+</nav>
+
+<!-- 题号抽屉 -->
+<div class="m-qdrawer" id="mQDrawer">
+  <div class="m-qdrawer-inner">
+    <div class="m-qdrawer-title">选择题目</div>
+    <div class="m-qgrid" id="mQGrid"></div>
+    <button class="m-qdrawer-close" id="mQDrawerClose">关闭</button>
+  </div>
+</div>
+
+<script src="data.js"></script>
+<script>
+/* =====================================================================
+ * 工作台 B · 完整学习引擎（与 A 同等级功能，代码独立重写）
+ * 闭环: 做题→Attempt→六档掌握度→错因→诊断→间隔复习→认知地图→快闪→模考→作战计划
+ * ===================================================================== */
+const CONFIG = {
+  storageNS: 'scnu_biology',
+  stateVersion: 2,
+  DAY: 86400000,
+  CURRENT_EXAM_BLUEPRINT: {
+    id: 'current_2025_plus', name: '当前考试蓝图（2025+）',
+    totalScore: 150, duration: 180, totalQuestions: 46,
+    structure: [
+      { section:'一、选择题', type:'choice', count:15, points:2, subtotal:30 },
+      { section:'二、判断题', type:'judge', count:10, points:2, subtotal:20 },
+      { section:'三、填空题', type:'fill', count:10, points:2, subtotal:20 },
+      { section:'四、名词解释', type:'name', count:5, points:4, subtotal:20 },
+      { section:'五、简述题', type:'short', count:6, points:10, subtotal:60 },
+    ],
+  },
+  LV_NAMES: ['未学','陌生','认识','熟悉','掌握','精通'],
+  LV_COLORS: ['#e6dfd0','#c96f5e','#d4b95e','#a3b98a','#7fa06b','#4c7a37'],
+  ERROR_TYPES: [
+    { k:'concept', t:'概念混淆' }, { k:'memory', t:'记忆错误' }, { k:'careless', t:'粗心' },
+    { k:'misread', t:'审题错误' }, { k:'omission', t:'知识遗漏' }, { k:'calculation', t:'计算错误' },
+    { k:'expression', t:'表达错误' }, { k:'other', t:'其他' },
+  ],
+};
+
+/* ---------- 状态 ---------- */
+const state = {
+  view:'home', ch:0, practice:null,
+  wrong:{}, attempts:{}, master:{},        // master: qid -> {lv:0-2, gap, ts}
+  manualLv:{}, errCause:{}, confDismiss:{},
+  flash:null, mock:null, mockPlan:null, mapCh:null,
+};
+let DATA=null, MOCKS=null, CHAPTERS=null;
+let searchTerm='';
+let lastRenderedView=null;
+
+/* ============ Mobile UI 2.0 ============ */
+const MOBILE_BREAKPOINT = 700;
+function isMobile(){ return window.innerWidth <= MOBILE_BREAKPOINT; }
+
+// 手机端底部导航映射（底部5项 → 对应 view）
+const MOBILE_NAV_VIEWS = {
+  home: 'home',
+  chapters: 'chapters',
+  concepts: 'concepts',
+  wrong: 'wrong',
+  profile: 'profile',  // 特殊：我的页面
+};
+
+// 判断当前 view 是否属于"沉浸式"（隐藏底部导航，如刷题、模拟、快闪）
+function isImmersiveView(){
+  return state.view === 'practice' || state.view === 'flash' || 
+         (state.view === 'mock' && state.mock && !state.mock.done);
+}
+
+// 获取手机端顶部栏标题
+function getMobileTitle(){
+  switch(state.view){
+    case 'home': return '普通生物学';
+    case 'chapters': return '选择章节';
+    case 'concepts': return '知识体系';
+    case 'map': return '认知地图';
+    case 'flash': return '名词快闪';
+    case 'practice': 
+      return state.practice ? state.practice.label : '练习';
+    case 'wrong': return '错题本';
+    case 'diag': return '学习诊断';
+    case 'mock':
+      if(state.mock && state.mock.done) return '模拟结果';
+      if(state.mock) return '模拟考试';
+      return '全真模拟';
+    case 'profile': return '我的';
+    default: return '普通生物学';
+  }
+}
+
+// 判断是否显示返回按钮
+function showMobileBack(){
+  return state.view === 'practice' || state.view === 'flash' || 
+         state.view === 'diag' || state.view === 'map' ||
+         (state.view === 'mock' && state.mock) ||
+         state.view === 'conceptDetail';
+}
+
+// 更新手机端 UI 状态
+function updateMobileUI(){
+  if(!isMobile()){
+    document.body.classList.remove('has-bottom-nav', 'immersive-practice');
+    return;
+  }
+  
+  document.body.classList.add('has-bottom-nav');
+  
+  // 沉浸式刷题/模拟/快闪
+  if(isImmersiveView()){
+    document.body.classList.add('immersive-practice');
+  } else {
+    document.body.classList.remove('immersive-practice');
+  }
+  
+  // 更新顶部栏标题
+  const titleEl = document.getElementById('mTitle');
+  if(titleEl) titleEl.textContent = getMobileTitle();
+  
+  // 更新返回按钮
+  const backBtn = document.getElementById('mBackBtn');
+  if(backBtn){
+    backBtn.style.visibility = showMobileBack() ? 'visible' : 'hidden';
+  }
+  
+  // 更新底部导航激活状态
+  document.querySelectorAll('.m-nav-item').forEach(btn=>{
+    const mv = btn.dataset.mv;
+    let active = false;
+    if(mv === 'home' && state.view === 'home') active = true;
+    else if(mv === 'chapters' && state.view === 'chapters') active = true;
+    else if(mv === 'concepts' && state.view === 'concepts') active = true;
+    else if(mv === 'wrong' && state.view === 'wrong') active = true;
+    else if(mv === 'profile' && state.view === 'profile') active = true;
+    // 刷题、模拟等也高亮对应入口
+    else if(mv === 'chapters' && (state.view === 'practice' || state.view === 'map')) active = true;
+    else if(mv === 'profile' && (state.view === 'diag' || state.view === 'mock' || state.view === 'flash')) active = true;
+    btn.classList.toggle('active', active);
+  });
+}
+
+// 手机端返回
+function mobileBack(){
+  if(state.view === 'practice'){
+    state.practice = null; state.view = 'chapters';
+  } else if(state.view === 'flash'){
+    state.flash = null; state.view = 'profile';
+  } else if(state.view === 'diag'){
+    state.view = 'profile';
+  } else if(state.view === 'map'){
+    state.view = 'chapters';
+  } else if(state.view === 'mock'){
+    if(state.mock){ state.mock = null; }
+    state.view = 'profile';
+  } else if(state.view === 'conceptDetail'){
+    state.view = 'concepts';
+  } else {
+    state.view = 'home';
+  }
+  saveState(); render();
+}
+
+// 打开题号抽屉
+function openQDrawer(list, currentIdx, answers, onSelect){
+  const drawer = document.getElementById('mQDrawer');
+  const grid = document.getElementById('mQGrid');
+  if(!drawer || !grid) return;
+  
+  grid.innerHTML = list.map((qid,i)=>{
+    const done = answers && answers[qid] !== undefined;
+    const current = i === currentIdx;
+    return `<button class="${done?'done':''} ${current?'current':''}" data-qidx="${i}">${i+1}</button>`;
+  }).join('');
+  
+  grid.querySelectorAll('button').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const idx = parseInt(btn.dataset.qidx);
+      drawer.classList.remove('show');
+      if(onSelect) onSelect(idx);
+    });
+  });
+  
+  drawer.classList.add('show');
+}
+
+// 关闭题号抽屉
+function closeQDrawer(){
+  const drawer = document.getElementById('mQDrawer');
+  if(drawer) drawer.classList.remove('show');
+}
+
+/* ---------- 持久化（v2 链式迁移） ---------- */
+function loadState(){
+  try{
+    const raw = JSON.parse(localStorage.getItem(CONFIG.storageNS+'.state.v'+CONFIG.stateVersion) || localStorage.getItem(CONFIG.storageNS+'.state.v1') || 'null');
+    if(raw){
+      state.view=raw.view||'home'; state.ch=raw.ch||0;
+      state.wrong=raw.wrong||{}; state.attempts=raw.attempts||{};
+      state.master=raw.master||{}; state.manualLv=raw.manualLv||{};
+      state.errCause=raw.errCause||{}; state.confDismiss=raw.confDismiss||{};
+      state.mockPlan=raw.mockPlan||null; state.mapCh=raw.mapCh??null;
+      if(raw.practice) state.practice=raw.practice;
+      if(raw.flash) state.flash=raw.flash;
+      if(raw.mock) state.mock=raw.mock;
+    }
+  }catch(e){}
+}
+function saveState(){
+  localStorage.setItem(CONFIG.storageNS+'.state.v'+CONFIG.stateVersion, JSON.stringify({
+    view:state.view, ch:state.ch, wrong:state.wrong, attempts:state.attempts,
+    master:state.master, manualLv:state.manualLv, errCause:state.errCause,
+    confDismiss:state.confDismiss, mockPlan:state.mockPlan, mapCh:state.mapCh,
+    practice:state.practice, flash:state.flash, mock:state.mock,
+  }));
+}
+
+/* ---------- Attempt 三态工具 ---------- */
+const attemptsOf = qid => Array.isArray(state.attempts[qid]) ? state.attempts[qid] : [];
+const gradedOf = qid => attemptsOf(qid).filter(a => a.correct === true || a.correct === false);
+function recordAttempt(qid, correct, src){
+  const a = state.attempts[qid] || (state.attempts[qid] = []);
+  a.push({ ts:Date.now(), correct, src:src||'practice' });
+  if(a.length>60) state.attempts[qid]=a.slice(-60);
+  if(correct===false){
+    const w = state.wrong[qid] || {cnt:0,last:0};
+    w.cnt++; w.last=Date.now(); state.wrong[qid]=w;
+    gradeItem(qid, 2);   // 错 → 不会（1天）
+  } else if(correct===true){
+    if(state.wrong[qid]) delete state.wrong[qid];
+    gradeItem(qid, 0);   // 对 → 认识（gap翻倍）
+  }
+  saveState();
+}
+function accuracyOf(qid){ const g=gradedOf(qid); return g.length ? g.filter(a=>a.correct===true).length/g.length : null; }
+
+/* ---------- 六档掌握度（V6.0 §3-4，A 语义迁移） ---------- */
+function getM(qid){ return state.master[qid]; }
+function gradeItem(qid, lv){
+  const m = getM(qid);
+  let gap;
+  if(lv===0)      gap = Math.min(m && m.gap ? m.gap*2 : 7, 28);   // 认识 → 7/14/28
+  else if(lv===1) gap = 3;                                          // 模糊 → 3
+  else            gap = 1;                                          // 不会 → 1
+  state.master[qid] = {lv, ts:Date.now(), gap};
+  delete state.manualLv[qid];
+  saveState();
+}
+function isMastered(qid){ const m=getM(qid); return m && m.lv===0 && m.gap>=28; }
+function isDue(qid){ const m=getM(qid); if(!m||isMastered(qid)) return false; return Date.now() >= m.ts + m.gap*CONFIG.DAY; }
+function dueQids(){ return Object.keys(state.master).filter(qid => isDue(qid) && QBYQID[qid]); }
+function sixLv(qid){
+  if(state.manualLv[qid]!==undefined) return state.manualLv[qid];
+  const g = gradedOf(qid);
+  const m = getM(qid);
+  if(g.length>=3){
+    const l3 = g.slice(-3);
+    if(l3.every(a=>a.correct===true) && (l3[2].ts - l3[0].ts) >= 2*CONFIG.DAY) return 5;  // 精通
+  }
+  if(m){
+    if(m.lv===0) return m.gap>=28 ? 4 : 3;   // 认识 → 掌握(28天)/熟悉
+    if(m.lv===1) return 2;                    // 模糊 → 了解
+    return 1;                                 // 不会 → 陌生
+  }
+  if(!g.length) return 0;
+  return g[g.length-1].correct===true ? 3 : 1;
+}
+function conceptLv(cid){
+  const c = (DATA.concepts.concepts||[]).find(x=>x.conceptId===cid);
+  if(!c || !(c.questionIds||[]).length) return 0;
+  const lvs = c.questionIds.map(qid => sixLv(qid));
+  return Math.round(lvs.reduce((s,v)=>s+v,0) / lvs.length);
+}
+function chapterLv(no){
+  const cs = (DATA.concepts.concepts||[]).filter(c=>c.chapterNo===no&&c.level===3);
+  if(!cs.length) return 0;
+  return Math.round(cs.reduce((s,c)=>s+conceptLv(c.conceptId),0) / cs.length);
+}
+function sixDistribution(){
+  const dist=[0,0,0,0,0,0];
+  DATA.questions.forEach(q=>dist[sixLv(q.qid)]++);
+  return dist;
+}
+/* 间隔复习待练清单（v6 三档） */
+function reviewList(){
+  return Object.keys(state.master).filter(qid => isDue(qid) && QBYQID[qid]).map(qid=>({qid, m:getM(qid)}));
+}
+
+/* ---------- 错因系统 ---------- */
+function setErrCause(qid, key){
+  const at = gradedOf(qid);
+  if(!at.length) return;
+  state.errCause[qid] = { key, ts:Date.now() };
+  saveState();
+}
+function errCauseOf(qid){ return state.errCause[qid]; }
+
+/* ---------- 疑似概念混淆（A 思想迁移） ---------- */
+function suspectConfusions(){
+  const res = [];
+  const conceptErr = {};
+  DATA.questions.forEach(q => {
+    const errTs = attemptsOf(q.qid).filter(a=>a.correct===false).map(a=>a.ts);
+    if(!errTs.length || !(q.conceptIds||[]).length) return;
+    q.conceptIds.forEach(cid => {
+      (conceptErr[cid] = conceptErr[cid] || []).push(...errTs);
+    });
+  });
+  for(const cid of Object.keys(conceptErr)){
+    const tsArr = [...new Set(conceptErr[cid])].sort((a,b)=>a-b);
+    if(tsArr.length>=2){
+      const span = tsArr[tsArr.length-1]-tsArr[0];
+      if(span > 30*60000){   // 间隔>30min 的多次错误 → 疑似混淆
+        const c = (DATA.concepts.concepts||[]).find(x=>x.conceptId===cid);
+        const dismissed = state.confDismiss[cid] && tsArr[tsArr.length-1] < state.confDismiss[cid];
+        if(!dismissed && c) res.push({ conceptId:cid, title:c.title, chapterNo:c.chapterNo, errCount:tsArr.length });
+      }
+    }
+  }
+  return res.sort((a,b)=>b.errCount-a.errCount);
+}
+
+/* ---------- 题库索引 ---------- */
+const QBYQID={}, QBYCH={}; let allQids=[];
+function indexQuestions(){
+  DATA.questions.forEach(q=>{ QBYQID[q.qid]=q; (QBYCH[q.chapterNo]=QBYCH[q.chapterNo]||[]).push(q.qid); });
+  allQids = DATA.questions.map(q=>q.qid);
+}
+
+/* ---------- 渲染工具 ---------- */
+function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+const TYPE_LABEL={choice:'单选题',judge:'判断题',fill:'填空题',name:'名词解释',short:'简述/问答'};
+const TYPE_CLASS={choice:'t-choice',judge:'t-judge',fill:'t-fill',name:'t-name',short:'t-short'};
+function chapterTitle(no){ const c=(CHAPTERS.chapters||[]).find(x=>x.chapterNo===no); return c?c.title:('第'+no+'章'); }
+function lvPill(lv){ return `<span class="lv-pill lv-bg${lv}">${CONFIG.LV_NAMES[lv]}</span>`; }
+
+/* ---------- 首页控制台（A 级） ---------- */
+function renderHome(){
+  const today=new Date().toDateString();
+  let tDone=0,tToday=0,tGraded=0,tCorrect=0;
+  for(const qid of allQids){
+    const a=attemptsOf(qid); tDone+=a.length;
+    a.forEach(x=>{ if(new Date(x.ts).toDateString()===today) tToday++; });
+    const g=gradedOf(qid); tGraded+=g.length; tCorrect+=g.filter(x=>x.correct===true).length;
+  }
+  const acc=tGraded?Math.round(tCorrect/tGraded*100):0;
+  const dist=sixDistribution();
+  const avgLv=Math.round(allQids.reduce((s,qid)=>s+sixLv(qid),0)/Math.max(1,allQids.length)*10)/10;
+  const due=dueQids();
+  const todayStart=new Date(); todayStart.setHours(0,0,0,0);
+  let todayErrMiss=0, todayN=0, todayOk=0;
+  for(const qid of allQids){ attemptsOf(qid).forEach(a=>{ if(a.ts<todayStart.getTime())return; todayN++; if(a.correct===true)todayOk++; else if(a.correct===false && !state.errCause[qid])todayErrMiss++; }); }
+  const todayAcc = todayN ? Math.round(todayOk/todayN*100) : null;
+  const wrongN=Object.keys(state.wrong).length;
+  const conf=suspectConfusions();
+
+  /* 今日任务：到期复习 > 最近错误 > 高频低掌握 */
+  const tasks=[];
+  if(due.length) tasks.push({icon:'🔁',label:`间隔复习 ${due.length} 题`,desc:'到期待复习，点此重练',act:`startPractice(${JSON.stringify(due)},'间隔复习')`});
+  const recentWrong=Object.keys(state.wrong).filter(qid=>QBYQID[qid]).sort((a,b)=>state.wrong[b].last-state.wrong[a].last).slice(0,10);
+  if(recentWrong.length) tasks.push({icon:'📕',label:`最近错题 ${recentWrong.length} 道`,desc:'答错待巩固',act:`startPractice(${JSON.stringify(recentWrong)},'最近错题')`});
+  if(conf.length) tasks.push({icon:'🧩',label:`疑似混淆 ${conf.length} 组`,desc:'同一知识点多次出错，建议专项',act:`state.view='diag';saveState();render()`});
+
+  // 手机端首页
+  if(isMobile()){
+    // 今日学习目标（默认50题，可根据情况调整）
+    const dailyGoal = 50;
+    const todayPct = Math.min(100, Math.round(tToday/dailyGoal*100));
+    
+    // 推荐章节（高频低掌握）
+    const recs = [];
+    const hotChapters = [4, 17, 21, 26, 30]; // 高频章节示例
+    for(const chNo of hotChapters){
+      if(recs.length >= 4) break;
+      const lv = chapterLv(chNo);
+      if(lv < 4){ // 掌握度低于4的推荐
+        recs.push({
+          no: chNo,
+          title: chapterTitle(chNo),
+          lv: lv,
+          icon: '🧬'
+        });
+      }
+    }
+    // 如果推荐不够，补充一些章节
+    if(recs.length < 3){
+      for(let i=1;i<=41 && recs.length<4;i++){
+        if(!recs.find(r=>r.no===i)){
+          recs.push({no:i, title:chapterTitle(i), lv:chapterLv(i), icon:'🧬'});
+        }
+      }
+    }
+
+    document.getElementById('mainArea').innerHTML=`
+    <div class="view">
+      <!-- Hero 区域 -->
+      <div class="m-hero">
+        <div class="m-hero-title">今日学习</div>
+        <div class="m-hero-sub">每天进步一点点 💪</div>
+        <div class="m-today-study">
+          <div class="m-today-num">${tToday} <small>/ ${dailyGoal} 题</small></div>
+          <div class="m-today-bar"><div class="m-today-fill" style="width:${todayPct}%"></div></div>
+          <div class="m-today-acc">
+            ${todayN ? `今日正确率 <b>${todayAcc}%</b>` : '开始今天的学习吧'}
+            ${todayErrMiss ? ` · ⚠ ${todayErrMiss}题错因未记` : ''}
+          </div>
+        </div>
+        ${tasks.length ? `<button class="m-hero-btn" onclick="${tasks[0].act}">📖 ${tasks[0].label} · 开始</button>` : 
+          `<button class="m-hero-btn" onclick="state.view='chapters';saveState();render()">📚 开始刷题</button>`}
+      </div>
+
+      <!-- 数据概览 -->
+      <div class="m-stats-row">
+        <div class="m-stat-card">
+          <div class="num">${wrongN}</div>
+          <div class="lbl">📕 错题</div>
+        </div>
+        <div class="m-stat-card">
+          <div class="num">${due.length}</div>
+          <div class="lbl">⏰ 待复习</div>
+        </div>
+        <div class="m-stat-card">
+          <div class="num">${avgLv}</div>
+          <div class="lbl">📊 掌握度</div>
+        </div>
+      </div>
+
+      <!-- 今日任务 -->
+      ${tasks.length ? `
+        <div class="m-section-title">✅ 今日任务</div>
+        <div class="m-recommend-list">
+          ${tasks.map(t=>`
+            <div class="m-rec-item" onclick="${t.act}">
+              <div class="rec-icon">${t.icon}</div>
+              <div class="rec-info">
+                <div class="rec-title">${t.label}</div>
+                <div class="rec-desc">${t.desc}</div>
+              </div>
+              <div class="rec-go">›</div>
+            </div>
+          `).join('')}
+        </div>
+      ` : ''}
+
+      <!-- 今日推荐 -->
+      <div class="m-section-title">
+        🎯 今日推荐
+        <span class="more" onclick="state.view='chapters';saveState();render()">全部章节 ›</span>
+      </div>
+      <div class="m-recommend-list">
+        ${recs.slice(0,4).map(r=>`
+          <div class="m-rec-item" onclick="goPracticeByChapter(${r.no})">
+            <div class="rec-icon">${r.icon}</div>
+            <div class="rec-info">
+              <div class="rec-title">第${r.no}章 ${esc(r.title)}</div>
+              <div class="rec-desc">掌握度 ${CONFIG.LV_NAMES[r.lv]} · ${(QBYCH[r.no]||[]).length}题</div>
+            </div>
+            <div class="rec-go">›</div>
+          </div>
+        `).join('')}
+      </div>
+
+      <!-- 快捷入口 -->
+      <div class="m-section-title">🚀 快捷入口</div>
+      <div class="m-stats-row" style="grid-template-columns:1fr 1fr">
+        <div class="m-stat-card" style="cursor:pointer" onclick="startFlash()">
+          <div class="num" style="font-size:20px">🃏</div>
+          <div class="lbl">名词快闪</div>
+        </div>
+        <div class="m-stat-card" style="cursor:pointer" onclick="startMock()">
+          <div class="num" style="font-size:20px">🎯</div>
+          <div class="lbl">全真模拟</div>
+        </div>
+      </div>
+    </div>`;
+    return;
+  }
+
+  // PC 端首页（保持原样）
+  document.getElementById('mainArea').innerHTML=`
+  <div class="view"><div class="ch-head"><h2>📊 学习控制台</h2>
+    <div class="ov">陈阅增《普通生物学》第5版 · 41 章 · ${allQids.length} 题 · 平均掌握度 ${lvPill(Math.min(5,Math.round(avgLv)))}</div></div>
+    ${todayN?`<div class="today-strip"><span>今日已做 <b>${todayN}</b> 题</span><span>正确率 <b style="color:${todayAcc>=70?'var(--ok)':todayAcc>=40?'var(--gold)':'var(--accent)'}">${todayAcc}%</b></span>${todayErrMiss?`<span style="color:var(--accent)">⚠ ${todayErrMiss} 题错因未记录</span>`:'<span style="color:var(--ok)">错因已记录 ✓</span>'}</div>`:''}
+    <div class="grid">
+      <div class="card"><div class="n">${tDone}</div><div class="d">累计做题</div></div>
+      <div class="card"><div class="n">${todayAcc}%</div><div class="d">总正确率</div></div>
+      <div class="card"><div class="n">${tToday}</div><div class="d">今日做题</div></div>
+      <div class="card"><div class="n" style="color:var(--accent)">${wrongN}</div><div class="d">错题</div></div>
+    </div>
+    <h3 class="serif" style="font-size:var(--fs-lg);margin:16px 0 8px">✅ 今日任务</h3>
+    ${tasks.length?tasks.map(t=>`<div class="task-row"><div class="t-icon" style="background:var(--blue-soft)">${t.icon}</div>
+      <div class="t-info"><div class="t-name2">${t.label}</div><div class="t-desc">${t.desc}</div></div>
+      <button class="go-btn" onclick="${t.act}">开始</button></div>`).join(''):'<div class="empty">今日无待办，继续刷题吧！</div>'}
+    <h3 class="serif" style="font-size:var(--fs-lg);margin:16px 0 8px">📈 六档掌握度分布</h3>
+    <div class="card">${dist.map((n,i)=>`<div style="display:flex;align-items:center;gap:8px;margin-top:4px">
+      <span style="width:70px;font-size:var(--fs-xs)">${CONFIG.LV_NAMES[i]}</span>
+      <div class="lv-bar" style="flex:1"><div class="lv-fill lv-bg${i}" style="width:${n/allQids.length*100}%"></div></div>
+      <span class="mono">${n}</span></div>`).join('')}</div>
+    <h3 class="serif" style="font-size:var(--fs-lg);margin:16px 0 8px">🚀 快捷入口</h3>
+    <div class="grid">
+      <div class="card click" onclick="goPracticeByChapter(4)"><h3>🔥 细胞代谢</h3><div class="d">五星高频 · 点击练习</div></div>
+      <div class="card click" onclick="state.view='map';saveState();render()"><h3>🗺 认知地图</h3><div class="d">全书哪里会哪里不会</div></div>
+      <div class="card click" onclick="startFlash()"><h3>🃏 名词快闪</h3><div class="d">翻牌背诵名词解释</div></div>
+      <div class="card click" onclick="startMock()"><h3>🎯 全真模拟</h3><div class="d">46题/150分 限时</div></div>
+    </div>
+  </div>`;
+}
+
+/* ---------- 章节列表 ---------- */
+function renderChapters(){
+  const subInfo = isMobile() ? `<div class="m-sub-info">${(CHAPTERS.chapters||[]).length} 章 · 点击进入练习</div>` : '';
+  document.getElementById('mainArea').innerHTML=`<div class="view"><div class="ch-head"><h2>📚 41 章知识体系</h2>
+    <div class="ov">陈阅增第5版 · 每章显示掌握度与题量 · 点击进入练习</div></div>
+    ${subInfo}
+    <div class="ch-list">${(CHAPTERS.chapters||[]).map(c=>{
+      const lv=chapterLv(c.chapterNo); const n=(QBYCH[c.chapterNo]||[]).length;
+      return `<div class="ch-row" onclick="goPracticeByChapter(${c.chapterNo})">
+        <span class="no">${String(c.chapterNo).padStart(2,'0')}</span>
+        <span class="tt">${esc(c.title)}</span>
+        <span class="hot">${esc(c.hotLevel||'')}</span>
+        <span class="mbar"><span class="mfill lv-bg${lv}" style="width:${lv/5*100}%"></span></span>
+        ${lvPill(lv)}
+        <span class="cnt">${n} 题</span></div>`;
+    }).join('')}</div></div>`;
+}
+
+/* ---------- 认知地图 ---------- */
+function renderMap(){
+  const cs=(DATA.concepts.concepts||[]).filter(c=>c.level===3);
+  const byCh={}; cs.forEach(c=>(byCh[c.chapterNo]=byCh[c.chapterNo]||[]).push(c));
+  let html=`<div class="view"><div class="ch-head"><h2>🗺 认知地图</h2>
+    <div class="ov">41 章 → 知识点掌握度热力图（基于真实 Attempt + 六档掌握度）</div></div>
+    ${CONFIG.LV_NAMES.map((n,i)=>`<span class="lv-pill lv-bg${i}" style="margin-right:4px">${n}</span>`).join('')}`;
+  Object.keys(byCh).map(Number).sort((a,b)=>a-b).forEach(no=>{
+    const list=byCh[no];
+    const avg=Math.round(list.reduce((s,c)=>s+conceptLv(c.conceptId),0)/list.length);
+    const open=state.mapCh===no;
+    html+=`<div class="map-ch">
+      <div class="map-ch-head" onclick="toggleMap(${no})">
+        <span class="no" style="font-family:var(--serif);font-weight:800;color:var(--accent)">${String(no).padStart(2,'0')}</span>
+        <span style="font-size:var(--fs-sm);font-weight:600">${esc(chapterTitle(no))}</span>
+        <div class="heat"><div class="heatf" style="width:${avg/5*100}%"></div></div>
+        ${lvPill(avg)}
+        <span style="font-size:var(--fs-xs);color:var(--ink-faint)">${open?'▾':'▸'}</span>
+      </div>
+      <div class="map-grid ${open?'open':''}">${list.map(c=>{
+        const lv=conceptLv(c.conceptId); const qn=(c.questionIds||[]).length;
+        return `<div class="map-cell lv-bg${lv}" onclick="goPracticeByConcept('${c.conceptId}')">
+          <div>${esc(c.title)}</div><div class="mono">${lvPill(lv)} · ${qn}题</div></div>`;
+      }).join('')}</div>
+    </div>`;
+  });
+  html+=`</div>`;
+  document.getElementById('mainArea').innerHTML=html;
+}
+function toggleMap(no){ state.mapCh = state.mapCh===no ? null : no; saveState(); renderMap(); }
+
+/* ---------- 知识树 ---------- */
+function renderConcepts(){
+  const cs=(DATA.concepts.concepts||[]);
+  const byCh={}; cs.forEach(c=>(byCh[c.chapterNo]=byCh[c.chapterNo]||[]).push(c));
+  const l2s=cs.filter(c=>c.level===2);
+  const l2byCh={}; l2s.forEach(c=>(l2byCh[c.chapterNo]=l2byCh[c.chapterNo]||[]).push(c));
+  let html=`<div class="view"><div class="ch-head"><h2>🧠 知识体系</h2>
+    <div class="ov">41 章 → ${cs.filter(c=>c.level===2).length} 节 → ${cs.filter(c=>c.level===3).length} 知识点 · 点击知识点看讲解卡并练习</div></div>`;
+  Object.keys(byCh).map(Number).sort((a,b)=>a-b).forEach(no=>{
+    const l3s=byCh[no].filter(c=>c.level===3);
+    html+=`<div class="ch-row" style="margin-bottom:4px" onclick="toggleMap(${no})">
+      <span class="no">${String(no).padStart(2,'0')}</span>
+      <span class="tt">${esc(chapterTitle(no))}</span>
+      <span class="cnt">${(l2byCh[no]||[]).length} 节 · ${l3s.length} 知识点</span></div>`;
+    html+=`<div id="chConcept-${no}" style="padding-left:16px;margin-bottom:10px">`;
+    l3s.forEach(c=>{
+      const qn=(c.questionIds||[]).length; const lv=conceptLv(c.conceptId);
+      html+=`<div class="concept-chip" onclick="showConceptCard('${c.conceptId}')"><span>${esc(c.title)}</span> ${lvPill(lv)}<span class="mono">${qn}题</span></div>`;
+    });
+    html+=`</div>`;
+  });
+  html+=`</div>`;
+  document.getElementById('mainArea').innerHTML=html;
+}
+
+/* ---------- 讲解卡（A 级：核心/易混/口诀/真题） ---------- */
+function conceptCardOf(cid){
+  const c=(DATA.concepts.concepts||[]).find(x=>x.conceptId===cid);
+  if(!c) return null;
+  const qs=(c.questionIds||[]).map(qid=>QBYQID[qid]).filter(Boolean);
+  const realQs=qs.filter(q=>q.source==='past_exam');
+  const years=[...new Set(realQs.map(q=>q.year))].sort((a,b)=>a-b);
+  const types={}; realQs.forEach(q=>types[q.type]=(types[q.type]||0)+1);
+  const lv=conceptLv(cid);
+  const wrong=qs.filter(q=>state.wrong[q.qid]).length;
+  return {
+    conceptId:cid, title:c.title, chapterNo:c.chapterNo, level:c.level,
+    questionCount:qs.length, realCount:realQs.length, years, types, lv, wrong,
+    qids:(c.questionIds||[]),
+  };
+}
+function showConceptCard(cid){
+  const card=conceptCardOf(cid);
+  if(!card) return;
+  const qs=card.qids.map(qid=>QBYQID[qid]).filter(Boolean);
+  const yearStr=card.years.length?card.years.join('/'):'无真题';
+  const typeStr=Object.entries(card.types).map(([t,n])=>`${TYPE_LABEL[t]||t}×${n}`).join(' ');
+  const detail=cardOfConcept(cid);
+  document.getElementById('mainArea').innerHTML=`
+  <div class="view">
+    <div class="ch-head"><h2>🧠 ${esc(card.title)}</h2>
+      <div class="ov">第${card.chapterNo}章 ${esc(chapterTitle(card.chapterNo))} · 掌握度 ${lvPill(card.lv)}</div></div>
+    ${detail?`<div class="concept-ref" style="margin-bottom:12px">
+      <div class="cr-title">📘 考点讲解 · ${esc(detail.title)}</div>
+      ${detail.core?`<div class="cr-row"><b>核心：</b>${esc(detail.core)}</div>`:''}
+      ${Array.isArray(detail.pts)&&detail.pts.length?`<div class="cr-row"><b>要点：</b>${detail.pts.map(esc).join('；')}</div>`:''}
+      ${Array.isArray(detail.pit)&&detail.pit.length?`<div class="cr-row cr-pit"><b>⚠️ 易错：</b>${detail.pit.map(esc).join('；')}</div>`:''}
+      ${detail.exam?`<div class="cr-row cr-exam"><b>🎯 ${esc(detail.exam)}</b></div>`:''}
+    </div>`:''}
+    <div class="card" style="margin-bottom:12px">
+      <h3>📊 知识点统计</h3>
+      <table><tbody>
+        <tr><td>关联题目</td><td>${card.questionCount} 题（真题 ${card.realCount}）</td></tr>
+        <tr><td>真题命中</td><td>${yearStr}</td></tr>
+        <tr><td>题型分布</td><td>${typeStr||'—'}</td></tr>
+        <tr><td>我的错误</td><td style="color:${card.wrong?'var(--accent)':'var(--ok)'}">${card.wrong} 题待复习</td></tr>
+      </tbody></table>
+    </div>
+    <h3 class="serif" style="font-size:var(--fs-lg);margin:12px 0 8px">📖 相关题目</h3>
+    <div class="q-list" id="cardQlist">${qs.map((q,i)=>questionHTML(q,i)).join('')}</div>
+    <div class="actions" style="margin-top:12px">
+      <button class="btn primary" onclick="startPractice(${JSON.stringify(card.qids)},'${esc(card.title)} 专项')">🎯 练习本知识点</button>
+      <button class="btn ghost" onclick="state.view='concepts';saveState();render()">← 返回知识</button>
+    </div>
+  </div>`;
+  attachQuestionEvents(document.getElementById('cardQlist'));
+}
+
+/* ---------- 做题引擎 ---------- */
+function goPracticeByChapter(no){ startPractice(QBYCH[no]||[], '第'+no+'章 · '+chapterTitle(no)); }
+function goPracticeByConcept(cid){ const c=conceptCardOf(cid); if(!c||!c.qids.length){alert('该知识点暂无题目');return;} startPractice(c.qids, '🧠 '+c.title); }
+function startPractice(list,label){
+  if(!list||!list.length){ alert('暂无题目'); return; }
+  state.practice={list,idx:0,answers:{},label:label||'练习'};
+  state.view='practice'; saveState(); render();
+}
+function questionHTML(q, idx){
+  let optHtml='';
+  if(q.options){ optHtml=`<div class="opts">${q.options.map((o,i)=>`<div class="opt" data-opt="${String.fromCharCode(65+i)}"><span class="letter">${String.fromCharCode(65+i)}</span><span>${esc(o)}</span></div>`).join('')}</div>`; }
+  return `<div class="question q-card" data-qid="${q.qid}" style="margin-bottom:10px">
+    <span class="q-type ${TYPE_CLASS[q.type]}">${TYPE_LABEL[q.type]}</span>
+    <div class="q-meta">${q.source==='past_exam'?`<span style="color:var(--accent)">${q.year}真题</span>`:'章节练习'} · ${esc(chapterTitle(q.chapterNo))} · <span class="mono">${q.qid}</span> · 掌握度 ${lvPill(sixLv(q.qid))}</div>
+    <div class="q-stem">${esc(q.stem)}</div>${optHtml}
+    <div class="q-answer" style="display:none;margin-top:10px;padding:10px;background:var(--paper-2);border-radius:8px"><b>答案：</b>${esc(q.answer)}</div>
+  </div>`;
+}
+function attachQuestionEvents(container){
+  container.querySelectorAll('.opt').forEach(el=>{
+    el.addEventListener('click',()=>{
+      const qcard=el.closest('.question'); const qid=qcard.dataset.qid; const q=QBYQID[qid];
+      const val=el.dataset.opt;
+      const correct = q.type==='judge' ? (val==='对')===String(q.answer).trim().startsWith('对') : val===String(q.answer).trim().charAt(0);
+      recordAttempt(qid, correct, 'practice');
+      el.classList.add(correct?'correct':'wrong');
+      qcard.querySelector('.q-answer').style.display='block';
+      if(!correct){ showErrPick(qcard, qid); }
+    });
+  });
+}
+function showErrPick(qcard, qid){
+  const q=QBYQID[qid];
+  const div=document.createElement('div');
+  div.className='err-pick';
+  div.innerHTML=`<span class="err-tip">❓ 这道题为什么错？（记录错因帮助诊断）</span>
+    <div class="err-btns">${CONFIG.ERROR_TYPES.map(e=>`<button class="err-btn" data-err="${e.k}">${e.t}</button>`).join('')}</div>`;
+  qcard.appendChild(div);
+  div.querySelectorAll('.err-btn').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      setErrCause(qid, btn.dataset.err);
+      div.classList.add('done'); div.textContent='错因已记录：'+btn.textContent;
+      const all=div.querySelectorAll('.err-btn'); if(all) all.forEach(b=>b.remove());
+    });
+  });
+}
+function renderPractice(){
+  const p=state.practice;
+  if(!p){ state.view='home'; render(); return; }
+  if(p.idx>=p.list.length){ renderPracticeDone(); return; }
+  const q=QBYQID[p.list[p.idx]];
+  const answered=p.answers[q.qid];
+  const main=document.getElementById('mainArea');
+  let body='';
+  if(q.type==='choice'&&q.options){
+    body=`<div class="opts">${q.options.map((o,i)=>{const l=String.fromCharCode(65+i);let cls='opt';if(answered){if(l===String(q.answer).trim().charAt(0))cls+=' correct';else if(answered===l)cls+=' wrong';}return `<div class="${cls}" data-opt="${l}"><span class="letter">${l}</span><span>${esc(o)}</span></div>`;}).join('')}</div>`;
+  }else if(q.type==='judge'){
+    body=`<div class="opts"><div class="opt ${answered==='对'?(String(q.answer).trim().startsWith('对')?'correct':'wrong'):''}" data-judge="对"><span class="letter">✓</span><span>对</span></div><div class="opt ${answered==='错'?(!String(q.answer).trim().startsWith('对')?'correct':'wrong'):''}" data-judge="错"><span class="letter">✗</span><span>错</span></div></div>`;
+  }else if(q.type==='fill'){
+    body=`<input class="ans-input" id="fillInput" placeholder="输入答案（多空分号分隔）" value="${esc(answered&&answered.v||'')}"><button class="btn primary" id="fillSubmit">📤 提交</button>`;
+  }else{
+    body=`<textarea class="ans-input" id="subjInput" style="min-height:100px" placeholder="在此作答…">${esc(answered&&answered.v||'')}</textarea><div class="actions"><button class="btn primary" id="subjSubmit">📤 提交自评</button></div>`;
+  }
+
+  // 手机端刷题布局
+  if(isMobile()){
+    // 进度点：只显示前后几题 + 当前
+    const dotRange = 9; // 显示9个点
+    const startDot = Math.max(0, Math.min(p.idx - Math.floor(dotRange/2), p.list.length - dotRange));
+    const endDot = Math.min(p.list.length, startDot + dotRange);
+    
+    main.innerHTML=`<div class="view">
+      <div class="m-practice-head">
+        <div class="m-practice-progress">第 ${p.idx+1} / ${p.list.length} 题</div>
+        <button class="btn ghost" style="padding:6px 12px;font-size:var(--fs-xs);min-height:auto" onclick="openPracticeDrawer()">题号 ▾</button>
+      </div>
+      <div class="m-q-dots">
+        ${p.list.slice(startDot, endDot).map((qq,i)=>{
+          const realIdx = startDot + i;
+          return `<span class="m-q-dot ${p.answers[qq]?'done':''} ${realIdx===p.idx?'now':''}"></span>`;
+        }).join('')}
+      </div>
+      <div class="q-card"><span class="q-type ${TYPE_CLASS[q.type]}">${TYPE_LABEL[q.type]}</span>
+        <div class="q-meta">${esc(chapterTitle(q.chapterNo))} ${q.source==='past_exam'?`· <span style="color:var(--accent)">${q.year}真题</span>`:''}</div>
+        <div class="q-stem">${esc(q.stem)}</div>${body}
+        ${answered?`<div class="feedback ${answered.correct?'ok':'no'} show">${answered.correct?'✅ 回答正确':'❌ 回答错误'}<div style="margin-top:6px"><b>答案：</b>${esc(q.answer)}</div></div>`:''}
+        ${conceptRefHTML(q)}
+      </div>
+      <!-- 手机端底部操作栏 -->
+      <div class="m-practice-footer">
+        <button class="m-pf-btn ghost" id="prevBtnM" ${p.idx===0?'disabled style="opacity:.5"':''}>← 上一题</button>
+        <button class="m-pf-btn primary" id="nextBtnM">${p.idx<p.list.length-1?'下一题 →':'🏁 完成'}</button>
+      </div>
+    </div>`;
+  } else {
+    // PC 端布局（保持原样）
+    main.innerHTML=`<div class="view">
+      <div class="ch-head"><h2>${esc(p.label)}</h2><div class="ov">第 ${p.idx+1}/${p.list.length} 题 · <span class="mono">${q.qid}</span> ${q.source==='past_exam'?`· <span style="color:var(--accent)">${q.year}真题</span>`:''} · 掌握度 ${lvPill(sixLv(q.qid))}</div></div>
+      <div class="q-card"><span class="q-type ${TYPE_CLASS[q.type]}">${TYPE_LABEL[q.type]}</span>
+        <div class="q-meta">${esc(chapterTitle(q.chapterNo))}</div>
+        <div class="q-stem">${esc(q.stem)}</div>${body}
+        ${answered?`<div class="feedback ${answered.correct?'ok':'no'} show">${answered.correct?'✅ 回答正确':'❌ 回答错误'}<div style="margin-top:6px"><b>答案：</b>${esc(q.answer)}</div></div>`:''}
+        ${conceptRefHTML(q)}
+        <div class="q-nav">
+          <button class="btn ghost" id="prevBtn" ${p.idx===0?'disabled':''}>← 上一题</button>
+          <div class="prog-dots">${p.list.slice(0,Math.min(p.list.length,30)).map((qq,i)=>`<span class="pdot ${p.answers[qq]?'done':''} ${i===p.idx?'now':''}"></span>`).join('')}</div>
+          <button class="btn primary" id="nextBtn">${p.idx<p.list.length-1?'下一题 →':'🏁 完成'}</button>
+        </div></div></div>`;
+  }
+
+  const submit=(val,correct)=>{
+    p.answers[q.qid]={v:val,correct}; recordAttempt(q.qid,correct,'practice');
+    if(!correct){ const qcard=document.querySelector('.q-card'); setTimeout(()=>showErrPick(qcard,q.qid),300); }
+    render();
+  };
+  main.querySelectorAll('.opt[data-opt],.opt[data-judge]').forEach(el=>{
+    el.addEventListener('click',()=>{ if(answered)return;
+      const val=el.dataset.opt||el.dataset.judge;
+      const correct=q.type==='judge'?(val==='对')===String(q.answer).trim().startsWith('对'):val===String(q.answer).trim().charAt(0);
+      submit(val,correct);
+    });
+  });
+  document.getElementById('fillSubmit')?.addEventListener('click',()=>{
+    const v=document.getElementById('fillInput').value.trim(); if(!v){alert('请输入答案');return;}
+    submit(v, judgeFill(v,q.answer));
+  });
+  document.getElementById('subjSubmit')?.addEventListener('click',()=>{
+    const v=document.getElementById('subjInput').value.trim(); if(!v){alert('请先作答');return;}
+    p.answers[q.qid]={v,correct:null}; recordAttempt(q.qid,null,'practice');
+    const fb=document.createElement('div'); fb.className='feedback show'; fb.style.cssText='background:var(--paper-2);border:1.5px solid var(--blue)';
+    fb.innerHTML=`<div style="font-weight:700;color:var(--blue);margin-bottom:6px">📖 参考答案</div><div>${esc(q.answer)}</div><div class="actions" style="margin-top:10px"><button class="btn primary" id="selfOk">✅ 答对了</button><button class="btn ghost" id="selfNo">❌ 答错了</button></div>`;
+    document.querySelector('.q-card').appendChild(fb);
+    document.getElementById('selfOk').onclick=()=>{ const a=state.attempts[q.qid]; if(a)a[a.length-1].correct=true; gradeItem(q.qid,0); delete state.wrong[q.qid]; saveState(); render(); };
+    document.getElementById('selfNo').onclick=()=>{ const a=state.attempts[q.qid]; if(a)a[a.length-1].correct=false; gradeItem(q.qid,2); state.wrong[q.qid]=state.wrong[q.qid]||{cnt:0,last:0}; state.wrong[q.qid].cnt++; state.wrong[q.qid].last=Date.now(); saveState(); render(); };
+  });
+  
+  // 下一题/上一题按钮（PC + Mobile）
+  const nextAction = () => { if(answered===undefined) submit(null,false); p.idx++; saveState(); render(); };
+  const prevAction = () => { if(p.idx>0){p.idx--;saveState();render();} };
+  
+  document.getElementById('nextBtn')?.addEventListener('click', nextAction);
+  document.getElementById('prevBtn')?.addEventListener('click', prevAction);
+  document.getElementById('nextBtnM')?.addEventListener('click', nextAction);
+  document.getElementById('prevBtnM')?.addEventListener('click', prevAction);
+  
+  const kh=(e)=>{
+    if(answered)return;
+    if(q.type==='choice'&&/^[1-4]$/.test(e.key)){const l=['A','B','C','D'][parseInt(e.key)-1]; if(q.options&&l<String.fromCharCode(65+q.options.length)){const c=l===String(q.answer).trim().charAt(0);submit(l,c);}}
+    else if(q.type==='judge'&&e.key==='j'){submit('对',String(q.answer).trim().startsWith('对'));}
+    else if(q.type==='judge'&&e.key==='f'){submit('错',!String(q.answer).trim().startsWith('对'));}
+    else if(e.key==='Enter'){nextAction();}
+  };
+  document.removeEventListener('keydown',kh); document.addEventListener('keydown',kh); main._kh=kh;
+}
+
+// 打开练习题号抽屉
+function openPracticeDrawer(){
+  const p = state.practice;
+  if(!p) return;
+  openQDrawer(p.list, p.idx, p.answers, (idx)=>{
+    p.idx = idx;
+    saveState();
+    render();
+  });
+}
+function renderPracticeDone(){
+  const p=state.practice;
+  const graded=Object.keys(p.answers).filter(qid=>p.answers[qid].correct===true||p.answers[qid].correct===false);
+  const correct=graded.filter(qid=>p.answers[qid].correct===true).length;
+  const pct=graded.length?Math.round(correct/graded.length*100):0;
+  document.getElementById('mainArea').innerHTML=`<div class="view" style="text-align:center;padding:40px 20px">
+    <div style="font-family:var(--serif);font-size:42px;color:var(--accent)">${correct}/${graded.length}</div>
+    <div style="font-size:var(--fs-md);color:var(--ink-soft);margin:10px 0 20px">${esc(p.label)} · 正确率 ${pct}%（未评分主观题不计入）</div>
+    <div class="actions" style="justify-content:center"><button class="btn primary" onclick="startPractice(${JSON.stringify(p.list)},'${esc(p.label)} 再练')">🔁 再练</button><button class="btn ghost" onclick="state.practice=null;state.view='home';saveState();render()">🏠 返回首页</button></div></div>`;
+}
+function judgeFill(user,answer){
+  const norm=s=>String(s).replace(/\s+/g,'').replace(/[（(].*?[)）]/g,'').toLowerCase();
+  const as=String(answer).split(/[；;]/).map(s=>s.trim()).filter(Boolean);
+  const us=String(user||'').split(/[；;]/).map(s=>s.trim()).filter(Boolean);
+  if(!as.length)return false;
+  let hit=0; as.forEach((a,i)=>{const un=norm(us[i]||''),an=norm(a); if(!un)return; if(un===an||(an.length>=2&&un.includes(an))||(un.length>=2&&an.includes(un)))hit++;});
+  return hit===as.length;
+}
+
+/* ---------- 错题本 ---------- */
+function renderWrong(){
+  const qids=Object.keys(state.wrong);
+  if(!qids.length){ document.getElementById('mainArea').innerHTML='<div class="view"><div class="empty">📕 错题本是空的</div></div>'; return; }
+  const items=qids.map(qid=>{ const q=QBYQID[qid]; if(!q)return''; const w=state.wrong[qid]; const cause=errCauseOf(qid);
+    return `<div class="w-item"><div class="info"><div><span class="q-type ${TYPE_CLASS[q.type]}">${TYPE_LABEL[q.type]}</span> <b>${esc(q.stem)}</b></div>
+      <div class="mono" style="margin-top:4px">${qid} · ${esc(chapterTitle(q.chapterNo))} · 错${w.cnt}次 · 掌握度 ${lvPill(sixLv(qid))}</div>
+      <div style="font-size:var(--fs-xs);color:var(--ok);margin-top:4px"><b>答案：</b>${esc(q.answer)}</div>
+      ${cause?`<div style="font-size:var(--fs-xs);color:var(--accent);margin-top:2px">错因：${CONFIG.ERROR_TYPES.find(e=>e.k===cause.key)?.t||cause.key}</div>`:''}</div>
+      <div class="act"><button class="btn primary" onclick="startPractice(['${qid}'],'错题重练')">🔁 重练</button><button class="btn ghost" onclick="forgiveWrong('${qid}')">✓ 已掌握</button></div></div>`;
+  }).join('');
+  document.getElementById('mainArea').innerHTML=`<div class="view"><div class="ch-head"><h2>📕 错题本（${qids.length}）</h2><div class="ov">correct===false 入本 · 答对自动移出 · 支持记录错因</div></div>${items}<div class="actions" style="margin-top:12px"><button class="btn primary" onclick="startPractice(${JSON.stringify(qids)},'全部错题重练')">🎯 重练全部</button></div></div>`;
+}
+function forgiveWrong(qid){ delete state.wrong[qid]; gradeItem(qid,0); saveState(); render(); }
+
+/* ---------- 诊断 ---------- */
+function renderDiag(){
+  const byCh={};
+  for(const qid of allQids){ const q=QBYQID[qid]; if(!q)continue; const g=gradedOf(qid); if(!g.length)continue;
+    byCh[q.chapterNo]=byCh[q.chapterNo]||{done:0,correct:0}; byCh[q.chapterNo].done++;
+    if(g[g.length-1].correct===true)byCh[q.chapterNo].correct++;
+  }
+  const rows=Object.keys(byCh).map(Number).sort((a,b)=>a-b).map(no=>{const d=byCh[no];const acc=Math.round(d.correct/d.done*100);
+    return `<tr><td>${String(no).padStart(2,'0')}</td><td>${esc(chapterTitle(no))}</td><td>${d.done}</td><td>${acc}%</td><td><div class="bar" style="height:12px;border-radius:4px;background:var(--ok);width:${acc}%"></div></td></tr>`;}).join('');
+  const conf=suspectConfusions();
+  const errAgg={}; Object.entries(state.errCause).forEach(([qid,e])=>{errAgg[e.key]=(errAgg[e.key]||0)+1;});
+  document.getElementById('mainArea').innerHTML=`<div class="view">
+    <div class="ch-head"><h2>🩺 学习诊断</h2><div class="ov">基于已评分作答（三态：null 不计入）</div></div>
+    <h3 class="serif" style="font-size:var(--fs-lg);margin:12px 0 8px">🧩 疑似概念混淆</h3>
+    ${conf.length?conf.map(c=>`<div class="task-row"><div class="t-icon" style="background:#f6e3df">🧩</div><div class="t-info"><div class="t-name2">${esc(c.title)}</div><div class="t-desc">第${c.chapterNo}章 · 出错${c.errCount}次</div></div><button class="go-btn" onclick="goPracticeByConcept('${c.conceptId}')">专项</button><button class="go-btn ghost" onclick="dismissConf('${c.conceptId}')">已攻克</button></div>`).join(''):'<div class="empty">暂无疑似混淆 ✓</div>'}
+    <h3 class="serif" style="font-size:var(--fs-lg);margin:16px 0 8px">🎯 错因分布</h3>
+    <div class="card">${CONFIG.ERROR_TYPES.map(e=>{const n=errAgg[e.k]||0;const mx=Math.max(1,...Object.values(errAgg));return `<div style="display:flex;align-items:center;gap:8px;margin-top:4px"><span style="width:80px;font-size:var(--fs-xs)">${e.t}</span><div class="lv-bar" style="flex:1"><div class="lv-fill lv-bg1" style="width:${n/mx*100}%"></div></div><span class="mono">${n}</span></div>`;}).join('')}</div>
+    <h3 class="serif" style="font-size:var(--fs-lg);margin:16px 0 8px">📊 章节表现</h3>
+    <table><thead><tr><th>章</th><th>标题</th><th>已做</th><th>正确率</th><th>分布</th></tr></thead><tbody>${rows}</tbody></table>
+  </div>`;
+}
+function dismissConf(cid){ state.confDismiss[cid]=Date.now(); saveState(); renderDiag(); }
+
+/* ---------- 快闪卡 ---------- */
+function startFlash(scope){
+  /* 名词解释快闪（浏览不产生Attempt；自评产生间隔复习证据） */
+  const names=DATA.questions.filter(q=>q.type==='name'&&q.answerStatus==='VERIFIED');
+  const list=scope?names.filter(q=>q.chapterNo===scope):names;
+  if(!list.length){alert('暂无名词题');return;}
+  state.flash={scope:scope||'all',list:list.map(q=>q.qid),idx:0,flipped:false,stats:[0,0,0]};
+  state.view='flash'; saveState(); render();
+}
+function renderFlash(){
+  const f=state.flash; if(!f){state.view='home';render();return;}
+  const main=document.getElementById('mainArea');
+  if(f.idx>=f.list.length){
+    main.innerHTML=`<div class="view" style="text-align:center;padding:40px 20px">
+      <div style="font-family:var(--serif);font-size:var(--fs-2xl);color:var(--accent)">背诵完成</div>
+      <div style="font-size:var(--fs-md);color:var(--ink-soft);margin:12px 0 20px">本轮 ${f.list.length} 张 · 认识${f.stats[0]} · 模糊${f.stats[1]} · 不会${f.stats[2]}</div>
+      <div class="actions" style="justify-content:center"><button class="btn primary" onclick="startFlash(${f.scope||'null'})">🔁 再背一轮</button><button class="btn ghost" onclick="state.flash=null;state.view='home';saveState();render()">🏠 返回</button></div></div>`;
+    return;
+  }
+  const q=QBYQID[f.list[f.idx]];
+  main.innerHTML=`<div class="view flash-wrap">
+    <div class="ch-head"><h2>🃏 名词快闪</h2><div class="ov">第 ${f.idx+1}/${f.list.length} · ${esc(chapterTitle(q.chapterNo))} · 浏览不算做题</div></div>
+    <div class="flash-card ${f.flipped?'flipped':''}" id="flashCard" onclick="flashFlip()">
+      <div class="flash-inner">
+        <div class="flash-face flash-front"><div class="term">${esc(q.stem)}</div><div style="font-size:var(--fs-xs);color:var(--ink-faint);margin-top:12px">点击翻面查看定义</div></div>
+        <div class="flash-face flash-back"><div class="def">${esc(q.answer)}</div></div>
+      </div>
+    </div>
+    ${f.flipped?`<div class="grade-row">
+      <button class="grade-btn g0" onclick="flashGrade(0)">😖 不会</button>
+      <button class="grade-btn g1" onclick="flashGrade(1)">🤔 模糊</button>
+      <button class="grade-btn g2" onclick="flashGrade(2)">😄 认识</button>
+    </div>`:''}
+    <div class="actions" style="justify-content:space-between;margin-top:16px">
+      <button class="btn ghost" onclick="flashSkip(-1)">← 上一张</button>
+      <button class="btn ghost" onclick="state.flash=null;state.view='home';saveState();render()">✕ 退出</button>
+      <button class="btn primary" onclick="flashSkip(1)">跳过 →</button>
+    </div></div>`;
+}
+function flashFlip(){ if(state.flash){ state.flash.flipped=!state.flash.flipped; const c=document.getElementById('flashCard'); if(c)c.classList.toggle('flipped',state.flash.flipped); } }
+function flashGrade(lv){
+  const f=state.flash; if(!f)return;
+  const qid=f.list[f.idx];
+  /* 自评映射：不会→lv2(1天) 模糊→lv1(3天) 认识→lv0(7天) */
+  gradeItem(qid, lv===0?2:(lv===1?1:0));
+  f.stats[lv===0?2:(lv===1?1:0)]++;
+  f.idx++; f.flipped=false; saveState(); renderFlash();
+}
+function flashSkip(dir){
+  const f=state.flash; if(!f)return;
+  f.idx=Math.max(0,Math.min(f.list.length,f.idx+dir)); f.flipped=false; saveState(); renderFlash();
+}
+
+/* ---------- 模拟考试 ---------- */
+function renderMockHome(){
+  const bp=CONFIG.CURRENT_EXAM_BLUEPRINT;
+  document.getElementById('mainArea').innerHTML=`<div class="view">
+    <div class="ch-head"><h2>🎯 全真模拟考试</h2><div class="ov">严格按 ${esc(bp.name)}（${bp.totalQuestions}题/${bp.totalScore}分/${bp.duration}分钟）</div></div>
+    <div class="card" style="margin-bottom:10px"><h3>📋 ${esc(bp.name)}</h3>
+      <table><thead><tr><th>大题</th><th>题量×分值</th><th>小计</th></tr></thead><tbody>
+        ${bp.structure.map(s=>`<tr><td>${esc(s.section)}</td><td>${s.count}×${s.points}</td><td><b>${s.subtotal}</b></td></tr>`).join('')}
+        <tr><td colspan="2"><b>总分</b></td><td><b>${bp.totalScore}</b></td></tr></tbody></table></div>
+    <div class="actions"><button class="btn primary" onclick="startMock()">🚀 开始模拟</button><button class="btn ghost" onclick="startMock('quick')">⚡ 快速模拟（30题）</button></div>
+    ${state.mockPlan?`<h3 class="serif" style="font-size:var(--fs-lg);margin:16px 0 8px">📋 上次作战计划</h3>${renderPlanTasks(state.mockPlan)}`:''}
+    <h3 class="serif" style="font-size:var(--fs-lg);margin:16px 0 8px">📚 原始模拟卷（4套资料保留）</h3>
+    <div class="ch-list">${(MOCKS.mocks||[]).map(m=>`<div class="ch-row" onclick="startRawMock('${m.mockId}')"><span class="no">${m.mockId.toUpperCase()}</span><span class="tt">${esc(m.name)}</span><span class="cnt">${m.chapters.reduce((s,c)=>s+c.questions.length,0)}题</span></div>`).join('')}</div>
+  </div>`;
+}
+function startMock(mode){
+  const bp=CONFIG.CURRENT_EXAM_BLUEPRINT;
+  const quota={}; bp.structure.forEach(s=>quota[s.type]=s.count);
+  if(mode==='quick'){quota.choice=10;quota.judge=5;quota.fill=5;quota.name=5;quota.short=5;}
+  const pool={};
+  for(const q of DATA.questions){ if(q.answerStatus!=='VERIFIED')continue; (pool[q.type]=pool[q.type]||[]).push(q.qid); }
+  const pick=[];
+  for(const t of Object.keys(quota)){ const src=pool[t]||[]; const need=Math.min(quota[t],src.length); shuffle(src).slice(0,need).forEach(qid=>pick.push(qid)); }
+  state.mock={list:shuffle(pick),idx:0,ans:{},self:{},startAt:Date.now(),duration:bp.duration*60000,done:false,mode:mode||'full'};
+  state.view='mock'; saveState(); renderMock();
+}
+function startRawMock(id){ const m=(MOCKS.mocks||[]).find(x=>x.mockId===id); if(!m)return;
+  const qids=[]; m.chapters.forEach(c=>c.questions.forEach(q=>qids.push(q.qid)));
+  state.mock={list:qids,idx:0,ans:{},self:{},startAt:Date.now(),duration:180*60000,done:false,mode:'raw'};
+  state.view='mock'; saveState(); renderMock();
+}
+function shuffle(arr){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function renderMock(){
+  const m=state.mock; const main=document.getElementById('mainArea');
+  if(!m){renderMockHome();return;}
+  if(m.done){renderMockResult();return;}
+  if(m.idx>=m.list.length){finishMock();return;}
+  const q=QBYQID[m.list[m.idx]]; const answered=m.ans[m.idx]!==undefined;
+  const remain=m.startAt+m.duration-Date.now();
+  if(remain<=0){finishMock();return;}
+  const mm=String(Math.max(0,Math.floor(remain/60000))).padStart(2,'0'), ss=String(Math.max(0,Math.floor(remain%60000/1000))).padStart(2,'0');
+  let body='';
+  if(q.type==='choice'&&q.options){body=`<div class="opts">${q.options.map((o,i)=>{const l=String.fromCharCode(65+i);let cls='opt';if(answered){if(l===String(q.answer).trim().charAt(0))cls+=' correct';else if(answered===l)cls+=' wrong';}return `<div class="${cls}" data-opt="${l}"><span class="letter">${l}</span><span>${esc(o)}</span></div>`;}).join('')}</div>`;}
+  else if(q.type==='judge'){body=`<div class="opts"><div class="opt" data-judge="对"><span class="letter">✓</span><span>对</span></div><div class="opt" data-judge="错"><span class="letter">✗</span><span>错</span></div></div>`;}
+  else if(q.type==='fill'){body=`<input class="ans-input" id="mFill" placeholder="填空答案（分号分隔）"><button class="btn primary" id="mFillBtn">📤 提交</button>`;}
+  else{body=`<textarea class="ans-input" id="mSubj" style="min-height:90px" placeholder="作答…"></textarea><button class="btn primary" id="mSubjBtn">📤 提交自评</button>`;}
+
+  // 手机端模拟考试布局
+  if(isMobile()){
+    const dotRange = 9;
+    const startDot = Math.max(0, Math.min(m.idx - Math.floor(dotRange/2), m.list.length - dotRange));
+    const endDot = Math.min(m.list.length, startDot + dotRange);
+    const answeredCount = Object.keys(m.ans).filter(k => m.ans[k] !== undefined).length;
+    
+    main.innerHTML=`<div class="view">
+      <div class="m-practice-head">
+        <div class="m-practice-progress">第 ${m.idx+1} / ${m.list.length} 题</div>
+        <button class="btn ghost" style="padding:6px 12px;font-size:var(--fs-xs);min-height:auto" onclick="openMockDrawer()">题号 ▾</button>
+      </div>
+      <div style="text-align:center;font-size:var(--fs-xs);color:var(--accent);margin-bottom:8px;font-weight:600">
+        ⏱ ${mm}:${ss} ${remain<600000?'· 不足10分钟!':''} · 已答 ${answeredCount} 题
+      </div>
+      <div class="m-q-dots">
+        ${m.list.slice(startDot, endDot).map((_,i)=>{
+          const realIdx = startDot + i;
+          const done = m.ans[realIdx] !== undefined;
+          return `<span class="m-q-dot ${done?'done':''} ${realIdx===m.idx?'now':''}"></span>`;
+        }).join('')}
+      </div>
+      <div class="q-card"><span class="q-type ${TYPE_CLASS[q.type]}">${TYPE_LABEL[q.type]}</span><div class="q-meta">${esc(chapterTitle(q.chapterNo))}</div>
+        <div class="q-stem">${esc(q.stem)}</div>${body}
+        ${answered?`<div class="feedback ${m.ans[m.idx]===true?'ok':'no'} show">${m.ans[m.idx]===true?'✅ 正确':'❌ 错误'}<div style="margin-top:6px"><b>答案：</b>${esc(q.answer)}</div></div>`:''}
+      </div>
+      <!-- 手机端底部操作栏 -->
+      <div class="m-practice-footer">
+        <button class="m-pf-btn ghost" id="mPrevM" ${m.idx===0?'disabled style="opacity:.5"':''}>← 上一题</button>
+        <button class="m-pf-btn primary" id="mNextM">${m.idx<m.list.length-1?'下一题 →':'🏁 交卷'}</button>
+      </div>
+    </div>`;
+  } else {
+    // PC 端布局（保持原样）
+    const gridHtml=`<div class="mock-grid" style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:10px">${m.list.map((_,i)=>`<button class="mg-btn ${m.ans[i]!==undefined?'answered':''} ${i===m.idx?'current':''}" data-mg="${i}" title="第${i+1}题">${i+1}</button>`).join('')}</div>`;
+    main.innerHTML=`<div class="view">
+      <div class="ch-head"><h2>🎯 模拟考试 ${m.mode==='quick'?'· 快速':''}</h2><div class="ov">第 ${m.idx+1}/${m.list.length} 题 · ⏱ ${mm}:${ss} <span style="color:var(--accent)">(${remain<600000?'剩余不足10分钟!':''})</span></div></div>
+      ${gridHtml}
+      <div class="q-card"><span class="q-type ${TYPE_CLASS[q.type]}">${TYPE_LABEL[q.type]}</span><div class="q-meta">${esc(chapterTitle(q.chapterNo))}</div>
+        <div class="q-stem">${esc(q.stem)}</div>${body}
+        ${answered?`<div class="feedback ${m.ans[m.idx]===true?'ok':'no'} show">${m.ans[m.idx]===true?'✅ 正确':'❌ 错误'}<div style="margin-top:6px"><b>答案：</b>${esc(q.answer)}</div></div>`:''}
+        <div class="q-nav"><button class="btn ghost" id="mPrev" ${m.idx===0?'disabled':''}>← 上一题</button><button class="btn primary" id="mNext">${m.idx<m.list.length-1?'下一题 →':'🏁 交卷'}</button></div>
+      </div></div>`;
+    
+    main.querySelectorAll('[data-mg]').forEach(btn=>{
+      btn.addEventListener('click',()=>{ m.idx=parseInt(btn.dataset.mg); saveState(); renderMock(); });
+    });
+  }
+
+  main.querySelectorAll('.opt[data-opt],.opt[data-judge]').forEach(el=>{el.addEventListener('click',()=>{if(answered)return;const val=el.dataset.opt||el.dataset.judge;const correct=q.type==='judge'?(val==='对')===String(q.answer).trim().startsWith('对'):val===String(q.answer).trim().charAt(0);m.ans[m.idx]=correct;recordAttempt(q.qid,correct,'mock');saveState();renderMock();});});
+  document.getElementById('mFillBtn')?.addEventListener('click',()=>{const v=document.getElementById('mFill').value.trim();if(!v){alert('请输入');return;}const c=judgeFill(v,q.answer);m.ans[m.idx]=c;recordAttempt(q.qid,c,'mock');saveState();renderMock();});
+  document.getElementById('mSubjBtn')?.addEventListener('click',()=>{const v=document.getElementById('mSubj').value.trim();if(!v){alert('请作答');return;}recordAttempt(q.qid,null,'mock');m.self[m.idx]=v;
+    const fb=document.createElement('div');fb.className='feedback show';fb.style.cssText='background:var(--paper-2);border:1.5px solid var(--blue)';
+    fb.innerHTML=`<div style="font-weight:700;color:var(--blue);margin-bottom:6px">📖 参考答案（自评：答对/答错）</div><div>${esc(q.answer)}</div><div class="actions" style="margin-top:10px"><button class="btn primary" id="sOk">✅ 答对</button><button class="btn ghost" id="sNo">❌ 答错</button></div>`;
+    document.querySelector('.q-card').appendChild(fb);
+    document.getElementById('sOk').onclick=()=>{m.ans[m.idx]=true;const a=state.attempts[q.qid];if(a)a[a.length-1].correct=true;gradeItem(q.qid,0);saveState();renderMock();};
+    document.getElementById('sNo').onclick=()=>{m.ans[m.idx]=false;const a=state.attempts[q.qid];if(a)a[a.length-1].correct=false;gradeItem(q.qid,2);state.wrong[q.qid]=state.wrong[q.qid]||{cnt:0,last:0};state.wrong[q.qid].cnt++;state.wrong[q.qid].last=Date.now();saveState();renderMock();};
+  });
+
+  // 下一题/上一题（PC + Mobile）
+  const nextAction = () => {
+    if(answered===undefined){m.ans[m.idx]=false;if(q.type==='short'||q.type==='name'){m.ans[m.idx]=null;}}
+    if(m.idx<m.list.length-1){
+      const nextUn = m.list.findIndex((_,i)=>i>m.idx && m.ans[i]===undefined);
+      m.idx = nextUn>-1 ? nextUn : m.idx+1;
+      saveState(); renderMock();
+    } else { finishMock(); }
+  };
+  const prevAction = () => {if(m.idx>0){m.idx--;saveState();renderMock();}};
+
+  document.getElementById('mNext')?.addEventListener('click', nextAction);
+  document.getElementById('mPrev')?.addEventListener('click', prevAction);
+  document.getElementById('mNextM')?.addEventListener('click', nextAction);
+  document.getElementById('mPrevM')?.addEventListener('click', prevAction);
+}
+
+// 打开模拟考试题号抽屉
+function openMockDrawer(){
+  const m = state.mock;
+  if(!m) return;
+  // 构造一个伪 answers 对象（索引为key）
+  const ansMap = {};
+  m.list.forEach((qid,i)=>{ ansMap[qid] = m.ans[i] !== undefined ? true : undefined; });
+  
+  openQDrawer(m.list, m.idx, ansMap, (idx)=>{
+    m.idx = idx;
+    saveState();
+    renderMock();
+  });
+}
+function finishMock(){
+  const m=state.mock; if(!m||m.done)return;
+  /* 交卷前检查未答（对齐 A：提示并跳转到第一个未答） */
+  const un = m.list.map((_,i)=>i).filter(i=>m.ans[i]===undefined && !m.userAns[i]);
+  if(un.length){
+    if(confirm(`还有 ${un.length} 题完全未作答，确定交卷吗？`)){
+      /* 继续交卷 */
+    } else {
+      m.idx = un[0]; saveState(); renderMock(); return;
+    }
+  }
+  m.done=true; m.endAt=Date.now();
+  m.analysis=mockAnalysis();
+  m.plan=buildMockPlan(m.analysis);
+  state.mockPlan=m.plan;
+  saveState(); renderMock();
+}
+function mockAnalysis(){
+  const m=state.mock; const byType={},byCh={};
+  let total=0,got=0,scored=0;
+  m.list.forEach((qid,i)=>{
+    const q=QBYQID[qid]; if(!q)return;
+    const ans=m.ans[i];
+    const isScored=ans===true||ans===false;
+    if(isScored){scored++;total++;if(ans===true)got++;}
+    byType[q.type]=byType[q.type]||{total:0,got:0}; if(isScored){byType[q.type].total++;if(ans===true)byType[q.type].got++;}
+    byCh[q.chapterNo]=byCh[q.chapterNo]||{total:0,got:0}; if(isScored){byCh[q.chapterNo].total++;if(ans===true)byCh[q.chapterNo].got++;}
+  });
+  /* 按蓝图计分：各题型按分值加权（主观题用 self 自评分） */
+  const bp=CONFIG.CURRENT_EXAM_BLUEPRINT;
+  const typePoint={choice:2,judge:2,fill:2,name:4,short:10};
+  let score=0, maxScore=0;
+  m.list.forEach((qid,i)=>{
+    const q=QBYQID[qid]; if(!q)return;
+    const pt=typePoint[q.type]||2;
+    maxScore+=pt;
+    if(q.type==='short'||q.type==='name'){
+      /* 主观题：用自评分（0-10 按比例折算） */
+      const self=(m.self&&m.self[i])||0;
+      score+=pt*(self/10);
+    } else {
+      if(m.ans[i]===true) score+=pt;
+    }
+  });
+  score=Math.round(score*10)/10;
+  const weakCh=Object.keys(byCh).map(no=>({no:+no,rate:byCh[no].got/byCh[no].total})).sort((a,b)=>a.rate-b.rate).slice(0,3);
+  const weakType=Object.keys(byType).map(t=>({t,rate:byType[t].got/byType[t].total})).sort((a,b)=>a.rate-b.rate).slice(0,2);
+  return {total,got,scored,score,max:maxScore,byType,byCh,weakCh,weakType};
+}
+function buildMockPlan(an){
+  if(!an)return null;
+  const tasks=[];
+  if(an.weakCh&&an.weakCh.length) tasks.push({kind:'chapter',label:'失分章节',desc:an.weakCh.map(w=>`第${w.no}章 ${esc(chapterTitle(w.no))}（正确率${Math.round(w.rate*100)}%）`).join('；'),act:`goPracticeByChapter(${an.weakCh[0].no})`});
+  if(an.weakType&&an.weakType.length) tasks.push({kind:'type',label:'薄弱题型',desc:an.weakType.map(w=>`${TYPE_LABEL[w.t]}（${Math.round(w.rate*100)}%）`).join('；'),act:`startPractice(${JSON.stringify(allQids.filter(qid=>QBYQID[qid].type===an.weakType[0].t))},'薄弱题型专项')`});
+  const wrongQids=mockWrongQids();
+  if(wrongQids.length) tasks.push({kind:'redo',label:'重做错题',desc:`${wrongQids.length} 道模考错题`,act:`startPractice(${JSON.stringify(wrongQids)},'模考错题重做')`});
+  return {ts:Date.now(),score:an.score,total:an.total,got:an.got,tasks};
+}
+function mockWrongQids(){ const m=state.mock; if(!m)return[]; return m.list.filter((qid,i)=>m.ans[i]===false); }
+function renderPlanTasks(plan){
+  if(!plan||!plan.tasks||!plan.tasks.length)return'';
+  return `<div class="card" style="margin-bottom:10px;border-color:var(--gold)"><h3 style="color:var(--accent)">📋 作战计划 · 得分 ${plan.score}/150</h3>
+    ${plan.tasks.map(t=>`<div class="task-row" style="border:none;padding:8px 0"><div class="t-icon" style="background:var(--blue-soft)">📌</div><div class="t-info"><div class="t-name2">${t.label}</div><div class="t-desc">${t.desc}</div></div><button class="go-btn" onclick="${t.act}">执行</button></div>`).join('')}</div>`;
+}
+function renderMockResult(){
+  const m=state.mock; if(!m)return;
+  const an=m.analysis||mockAnalysis();
+  const pct=an.scored?Math.round(an.got/an.scored*100):0;
+  let typeRows='';
+  CONFIG.CURRENT_EXAM_BLUEPRINT.structure.forEach(sec=>{
+    const t=an.byType[sec.type];
+    const rate=t&&t.total?Math.round(t.got/t.total*100):0;
+    typeRows+=`<div class="mock-type-row"><span class="tl">${esc(sec.section)}</span><div class="bar"><div class="bf" style="width:${rate}%"></div></div><span class="mono" style="width:50px">${t?`${t.got}/${t.total}`:'-'}</span></div>`;
+  });
+  document.getElementById('mainArea').innerHTML=`<div class="view">
+    <div class="ch-head"><h2>🎯 模拟考试结果</h2></div>
+    <div class="card" style="text-align:center;margin-bottom:12px"><div class="mock-score">${an.score}<span style="font-size:var(--fs-md);color:var(--ink-faint)">/150</span></div>
+      <div style="font-size:var(--fs-sm);color:var(--ink-soft)">评分题 ${an.got}/${an.scored} · 正确率 ${pct}%</div></div>
+    <div class="card" style="margin-bottom:12px"><h3>📊 各题型表现</h3>${typeRows}</div>
+    <div class="card" style="margin-bottom:12px"><h3>📝 主观题自评（简述/问答 每题 10 分）</h3>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-top:8px">${m.list.map((qid,i)=>{
+        const q=QBYQID[qid];
+        if(q.type!=='short'&&q.type!=='name') return '';
+        return `<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+          <span style="flex:1;font-size:var(--fs-sm);color:var(--ink-soft)">${esc(q.stem.slice(0,60))}${q.stem.length>60?'…':''}</span>
+          <input class="ans-input" style="width:70px;min-height:auto;margin:0;padding:5px 8px" type="number" min="0" max="10" step="1" data-selfscore="${i}" value="${m.self[i]??''}" placeholder="0-10">
+          <span class="mono">/10</span>
+        </div>`;
+      }).join('')}</div></div>
+    ${renderPlanTasks(m.plan)}
+    <div class="actions"><button class="btn primary" onclick="startMock()">🔁 再模拟</button><button class="btn ghost" onclick="state.mock=null;state.view='home';saveState();render()">🏠 返回</button></div>
+  </div>`;
+  /* 主观题自评分事件：变更后重新计算分数 */
+  document.querySelectorAll('[data-selfscore]').forEach(inp=>{
+    inp.addEventListener('change',()=>{
+      let v=parseFloat(inp.value);
+      if(isNaN(v)||v<0)v=0;
+      if(v>10)v=10;
+      m.self= m.self||{};
+      m.self[parseInt(inp.dataset.selfscore)]=v;
+      m.analysis=mockAnalysis();
+      m.plan=buildMockPlan(m.analysis);
+      state.mockPlan=m.plan;
+      saveState(); renderMockResult();
+    });
+  });
+}
+
+/* ---------- 考点讲解卡（对齐 A 的 conceptRefHTML） ---------- */
+const CARD_BY_ID = {};
+function indexCards(){
+  (DATA.cards||[]).forEach(c=>{ CARD_BY_ID[c.title]=c; });
+}
+function cardOfConcept(cid){
+  const c = (DATA.concepts.concepts||[]).find(x=>x.conceptId===cid);
+  return c ? CARD_BY_ID[c.title] || null : null;
+}
+function cardOfQ(q){
+  if(!q || !q.conceptIds || !q.conceptIds.length) return null;
+  for(const cid of q.conceptIds){
+    const c = (DATA.concepts.concepts||[]).find(x=>x.conceptId===cid);
+    if(c && CARD_BY_ID[c.title]) return CARD_BY_ID[c.title];
+  }
+  return null;
+}
+function conceptRefHTML(q){
+  const card = cardOfQ(q);
+  if(!card) return '';
+  return `<div class="concept-ref">
+    <div class="cr-title">📘 考点 · ${esc(card.title)}</div>
+    ${card.core?`<div class="cr-row"><b>核心：</b>${esc(card.core)}</div>`:''}
+    ${Array.isArray(card.pts)&&card.pts.length?`<div class="cr-row"><b>要点：</b>${card.pts.map(esc).join('；')}</div>`:''}
+    ${Array.isArray(card.pit)&&card.pit.length?`<div class="cr-row cr-pit"><b>⚠️ 易错：</b>${card.pit.map(esc).join('；')}</div>`:''}
+    ${card.exam?`<div class="cr-row cr-exam"><b>🎯 ${esc(card.exam)}</b></div>`:''}
+  </div>`;
+}
+
+/* ---------- 我的页面（Mobile UI 2.0） ---------- */
+function renderProfile(){
+  const dist=sixDistribution();
+  const avgLv=Math.round(allQids.reduce((s,qid)=>s+sixLv(qid),0)/Math.max(1,allQids.length)*10)/10;
+  const wrongN=Object.keys(state.wrong).length;
+  const due=dueQids();
+  
+  let tDone=0,tGraded=0,tCorrect=0;
+  for(const qid of allQids){
+    const a=attemptsOf(qid); tDone+=a.length;
+    const g=gradedOf(qid); tGraded+=g.length; tCorrect+=g.filter(x=>x.correct===true).length;
+  }
+  const acc=tGraded?Math.round(tCorrect/tGraded*100):0;
+  
+  const html = `
+  <div class="view">
+    <div class="m-profile-header">
+      <div class="m-profile-name">普通生物学备考</div>
+      <div class="m-profile-desc">华南师大 906/863 · 陈阅增第5版 · 41章</div>
+      <div style="display:flex;gap:16px;margin-top:16px">
+        <div style="flex:1;text-align:center">
+          <div style="font-family:var(--serif);font-size:28px;font-weight:800">${avgLv}</div>
+          <div style="font-size:11px;opacity:.85">平均掌握度</div>
+        </div>
+        <div style="flex:1;text-align:center">
+          <div style="font-family:var(--serif);font-size:28px;font-weight:800">${allQids.length}</div>
+          <div style="font-size:11px;opacity:.85">总题数</div>
+        </div>
+        <div style="flex:1;text-align:center">
+          <div style="font-family:var(--serif);font-size:28px;font-weight:800">${acc}%</div>
+          <div style="font-size:11px;opacity:.85">正确率</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="m-lv-dist">
+      <div style="font-weight:700;font-size:var(--fs-sm);margin-bottom:8px">📈 六档掌握度分布</div>
+      ${dist.map((n,i)=>`<div class="m-lv-row">
+        <span class="m-lv-name">${CONFIG.LV_NAMES[i]}</span>
+        <div class="m-lv-bar"><div class="m-lv-fill lv-bg${i}" style="width:${allQids.length?n/allQids.length*100:0}%"></div></div>
+        <span class="m-lv-num">${n}</span>
+      </div>`).join('')}
+    </div>
+
+    <div class="m-menu-group">
+      <div class="m-menu-item" onclick="state.view='mock';saveState();render()">
+        <div class="m-icon">🎯</div>
+        <div class="m-label">全真模拟考试</div>
+        <div class="m-arrow">›</div>
+      </div>
+      <div class="m-menu-item" onclick="startFlash()">
+        <div class="m-icon">🃏</div>
+        <div class="m-label">名词快闪背诵</div>
+        <div class="m-arrow">›</div>
+      </div>
+      <div class="m-menu-item" onclick="state.view='diag';saveState();render()">
+        <div class="m-icon">🩺</div>
+        <div class="m-label">学习诊断</div>
+        <div class="m-value">${due.length}题待复习</div>
+        <div class="m-arrow">›</div>
+      </div>
+    </div>
+
+    <div class="m-menu-group">
+      <div class="m-menu-item" onclick="state.view='map';saveState();render()">
+        <div class="m-icon">🗺</div>
+        <div class="m-label">认知地图</div>
+        <div class="m-arrow">›</div>
+      </div>
+      <div class="m-menu-item" onclick="document.getElementById('syncBtn').click()">
+        <div class="m-icon" style="background:#e4ead8">☁</div>
+        <div class="m-label">同步学习数据</div>
+        <div class="m-arrow">›</div>
+      </div>
+    </div>
+
+    <div class="m-menu-group">
+      <div class="m-menu-item" onclick="if(confirm('确定要清除所有学习数据吗？此操作不可恢复。')){localStorage.removeItem(CONFIG.storageNS+'.state.v'+CONFIG.stateVersion);localStorage.removeItem(CONFIG.storageNS+'.state.v1');location.reload();}">
+        <div class="m-icon" style="background:#f6e3df">🗑</div>
+        <div class="m-label" style="color:var(--accent)">重置学习数据</div>
+        <div class="m-arrow">›</div>
+      </div>
+    </div>
+
+    <div style="text-align:center;font-size:11px;color:var(--ink-faint);margin-top:20px">
+      工作台 B · Mobile UI 2.0
+    </div>
+  </div>`;
+  
+  document.getElementById('mainArea').innerHTML = html;
+}
+
+/* ---------- 主渲染 ---------- */
+function render(){
+  document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.v===state.view));
+  const pageChanged=lastRenderedView!==null&&lastRenderedView!==state.view;
+  lastRenderedView=state.view;
+  const reduced=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const doRender=()=>{
+    const main=document.getElementById('mainArea');
+    if(state.view==='home')renderHome();
+    else if(state.view==='chapters')renderChapters();
+    else if(state.view==='concepts')renderConcepts();
+    else if(state.view==='map')renderMap();
+    else if(state.view==='flash')renderFlash();
+    else if(state.view==='practice')renderPractice();
+    else if(state.view==='wrong')renderWrong();
+    else if(state.view==='diag')renderDiag();
+    else if(state.view==='mock'){ if(state.mock&&!state.mock.done)renderMock(); else renderMockHome(); }
+    else if(state.view==='profile')renderProfile();
+    updateProgress();
+    updateMobileUI();
+  };
+  if(document.startViewTransition&&pageChanged&&!reduced){
+    document.startViewTransition(()=>{doRender();window.scrollTo({top:0,behavior:'instant'});});
+  } else { doRender(); if(pageChanged)window.scrollTo({top:0,behavior:'instant'}); }
+}
+function updateProgress(){
+  const avg=allQids.length?Math.round(allQids.reduce((s,qid)=>s+sixLv(qid),0)/allQids.length*10)/10:0;
+  document.getElementById('progFill').style.width=(avg/5*100)+'%';
+  document.getElementById('progTxt').textContent=avg;
+}
+
+/* ---------- ☁ Vault 同步（对齐 A：学习数据回写 05_题库/学习数据.json） ---------- */
+let vaultDirHandle = null;
+function idbOpen(){
+  return new Promise((res,rej)=>{
+    const r = indexedDB.open('scnu_biology_vault', 1);
+    r.onupgradeneeded = ()=> r.result.createObjectStore('kv');
+    r.onsuccess = ()=> res(r.result);
+    r.onerror = ()=> rej(r.error);
+  });
+}
+async function idbGet(k){ try{ const db=await idbOpen(); return await new Promise(res=>{ const q=db.transaction('kv').objectStore('kv').get(k); q.onsuccess=()=>res(q.result); q.onerror=()=>res(null); }); }catch(e){ return null; } }
+async function idbSet(k,v){ try{ const db=await idbOpen(); await new Promise(res=>{ const tx=db.transaction('kv','readwrite'); tx.objectStore('kv').put(v,k); tx.oncomplete=()=>res(); tx.onerror=()=>res(); }); }catch(e){} }
+function buildStudyData(){
+  const dist = sixDistribution();
+  return {
+    exportedAt: new Date().toISOString(),
+    workbenchId: 'scnu-906-pusheng',
+    summary: {
+      questionsLogged: Object.keys(state.attempts).length,
+      totalAttempts: Object.values(state.attempts).reduce((s,a)=>s+a.length,0),
+      errorLog: Object.values(state.errCause).length,
+      suspectConfusions: suspectConfusions().map(c=>c.conceptId),
+      mastery6: CONFIG.LV_NAMES.map((n,i)=>`${n}:${dist[i]}`).join(' '),
+    },
+    attempts: state.attempts,
+    master: state.master,
+    manualLv: state.manualLv,
+    errCause: state.errCause,
+    confDismiss: state.confDismiss,
+    mockPlan: state.mockPlan,
+  };
+}
+async function getVaultDir(force){
+  if(vaultDirHandle && !force) return vaultDirHandle;
+  if(!window.showDirectoryPicker) return null;
+  const saved = await idbGet('vaultDir');
+  if(saved && !force){
+    try{
+      let perm = await saved.queryPermission({mode:'readwrite'});
+      if(perm !== 'granted') perm = await saved.requestPermission({mode:'readwrite'});
+      if(perm === 'granted'){ vaultDirHandle = saved; return saved; }
+    }catch(e){}
+  }
+  try{
+    const h = await window.showDirectoryPicker({ id:'vault_scnu', mode:'readwrite' });
+    vaultDirHandle = h; await idbSet('vaultDir', h); return h;
+  }catch(e){ return null; }
+}
+document.getElementById('syncBtn')?.addEventListener('click', async ()=>{
+  const data = buildStudyData();
+  const dir = await getVaultDir();
+  if(dir){
+    try{
+      const fh = await dir.getFileHandle('学习数据.json', {create:true});
+      const w = await fh.createWritable();
+      await w.write(JSON.stringify(data, null, 1));
+      await w.close();
+      const btn = document.getElementById('syncBtn');
+      btn.textContent = '✓ 已同步'; setTimeout(()=>btn.textContent='☁ 同步', 2000);
+      return;
+    }catch(e){ alert('写入失败：'+e.message); return; }
+  }
+  if(!window.showDirectoryPicker){
+    const blob = new Blob([JSON.stringify(data,null,1)], {type:'application/json'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = '学习数据.json';
+    a.click(); URL.revokeObjectURL(a.href);
+    alert('当前浏览器不支持直接写入磁盘，已下载 学习数据.json —— 请手动放入 05_题库/（推荐用 Chrome/Edge）');
+    return;
+  }
+});
+
+/* ---------- 事件 ---------- */
+document.querySelectorAll('.nav button').forEach(b=>{
+  b.addEventListener('click',()=>{ state.view=b.dataset.v; if(b.dataset.v!=='practice')state.practice=null; if(b.dataset.v!=='mock')state.mock=null; saveState(); render(); });
+});
+document.getElementById('topBtn')?.addEventListener('click',()=>window.scrollTo({top:0,behavior:'smooth'}));
+window.addEventListener('scroll',()=>document.getElementById('topBtn')?.classList.toggle('show',window.scrollY>400));
+
+/* ---------- Mobile UI 2.0 事件 ---------- */
+// 底部导航
+document.querySelectorAll('.m-nav-item').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    const mv = btn.dataset.mv;
+    if(mv === 'profile'){
+      state.view = 'profile';
+    } else {
+      state.view = mv;
+    }
+    if(mv !== 'practice') state.practice = null;
+    if(mv !== 'mock') state.mock = null;
+    if(mv !== 'flash') state.flash = null;
+    saveState(); render();
+  });
+});
+
+// 返回按钮
+document.getElementById('mBackBtn')?.addEventListener('click', mobileBack);
+
+// 题号抽屉关闭
+document.getElementById('mQDrawerClose')?.addEventListener('click', closeQDrawer);
+document.getElementById('mQDrawer')?.addEventListener('click', (e)=>{
+  if(e.target.id === 'mQDrawer') closeQDrawer();
+});
+
+// 右上角菜单按钮
+document.getElementById('mMenuBtn')?.addEventListener('click', ()=>{
+  // 简单处理：跳转到我的页面
+  if(state.view !== 'profile'){
+    state.view = 'profile';
+    saveState(); render();
+  }
+});
+
+// 窗口大小变化时重新渲染
+window.addEventListener('resize', ()=>{
+  // 只在跨断点时重新渲染
+  if(typeof window._lastMobile === 'undefined'){
+    window._lastMobile = isMobile();
+  }
+  const nowMobile = isMobile();
+  if(nowMobile !== window._lastMobile){
+    window._lastMobile = nowMobile;
+    updateMobileUI();
+  }
+});
+
+/* ---------- 启动 ---------- */
+function boot(){
+  if(typeof WORKBENCH_DATA!=='undefined'&&WORKBENCH_DATA.questions){
+    DATA=WORKBENCH_DATA; CHAPTERS=WORKBENCH_DATA.chapters; MOCKS=WORKBENCH_DATA.mocks;
+    indexQuestions(); indexCards(); loadState(); render(); return;
+  }
+  Promise.all([fetch('data/questions.json').then(r=>r.json()),fetch('data/chapters.json').then(r=>r.json()),fetch('data/concepts.json').then(r=>r.json()),fetch('data/mocks.json').then(r=>r.json())])
+  .then(([q,c,cp,m])=>{DATA=q;CHAPTERS=c;MOCKS=m;DATA.concepts=cp;indexQuestions();loadState();render();})
+  .catch(e=>{document.getElementById('mainArea').innerHTML=`<div class="view"><div class="empty">❌ 数据加载失败：${esc(e.message)}</div></div>`;});
+}
+boot();
+
+/* PWA：离线缓存应用壳与数据；学习进度仍保存在 localStorage */
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').catch(() => {});
+  });
+}
+</script>
+</body>
+</html>
